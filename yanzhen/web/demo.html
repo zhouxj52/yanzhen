@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>报销系统 · 验真测试环境</title>
+  <style>
+    body {
+      font: 15px system-ui;
+      background: #f4f5f7;
+      color: #192133;
+      margin: 0;
+    }
+    main {
+      max-width: 850px;
+      margin: 60px auto;
+      padding: 30px;
+      background: white;
+      border: 1px solid #e1e5eb;
+      border-radius: 16px;
+    }
+    small {
+      color: #6d778a;
+    }
+    h1 {
+      margin-bottom: 8px;
+    }
+    button,
+    select,
+    input {
+      font: inherit;
+      padding: 10px 14px;
+      border: 1px solid #d4dbe6;
+      border-radius: 7px;
+    }
+    button {
+      background: #264fd4;
+      color: white;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+    }
+    td,
+    th {
+      text-align: left;
+      padding: 13px;
+      border-bottom: 1px solid #e5e9ef;
+    }
+    label {
+      display: block;
+      margin: 15px 0;
+    }
+    input {
+      width: 70%;
+    }
+    #message {
+      min-height: 25px;
+      color: #315341;
+    }
+    .badge {
+      background: #fff4dc;
+      color: #835d14;
+      padding: 5px 10px;
+      border-radius: 30px;
+      font-size: 12px;
+    }
+  </style>
+  <main>
+    <span class="badge">受控测试环境 · 合成数据</span>
+    <h1>团队报销台</h1>
+    <small>此应用仅用于验证验收工具，不包含真实账号或财务数据。</small>
+    <section id="login">
+      <label
+        >演示身份
+        <select aria-label="演示身份" id="user">
+          <option value="alice">Alice · 普通成员</option>
+          <option value="bob">Bob · 普通成员</option>
+          <option value="admin">管理员</option>
+        </select></label
+      ><button id="signin">进入工作台</button>
+    </section>
+    <section id="workspace" hidden>
+      <h2 id="greeting"></h2>
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th>
+            <th>归属</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody id="records"></tbody>
+      </table>
+      <div id="edit">
+        <label>报销说明 <input aria-label="报销说明" id="note" /></label
+        ><button data-testid="save-note" data-action="save-note">
+          __SAVE_LABEL__
+        </button>
+      </div>
+      <p id="message" role="status"></p>
+    </section>
+  </main>
+  <script>
+    const base = "/demo/__RUN_ID__/api";
+    const key = "yz-demo-__RUN_ID__";
+    let token = sessionStorage.getItem(key);
+    let username = sessionStorage.getItem(key + "-user");
+    async function api(path, method = "GET", body) {
+      const r = await fetch(base + path, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {}),
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || r.status);
+      return d;
+    }
+    async function load() {
+      const d = await api("/records");
+      document.querySelector("#login").hidden = true;
+      document.querySelector("#workspace").hidden = false;
+      document.querySelector("#greeting").textContent = username + " 的报销单";
+      const tbody = document.querySelector("#records");
+      tbody.replaceChildren();
+      for (const record of d.records) {
+        const tr = document.createElement("tr");
+        for (const field of ["id", "owner", "amount", "status", "note"]) {
+          const td = document.createElement("td");
+          td.textContent = record[field];
+          tr.append(td);
+        }
+        tbody.append(tr);
+      }
+      const own = d.records.find((x) => x.id === 2);
+      document.querySelector("#edit").hidden = !own;
+      if (own) document.querySelector("#note").value = own.note;
+    }
+    document.querySelector("#signin").onclick = async () => {
+      try {
+        username = document.querySelector("#user").value;
+        const d = await api("/login", "POST", { username });
+        token = d.token;
+        sessionStorage.setItem(key, token);
+        sessionStorage.setItem(key + "-user", username);
+        await load();
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+    document.querySelector('[data-testid="save-note"]').onclick = async () => {
+      try {
+        await api("/records/2", "PATCH", {
+          note: document.querySelector("#note").value,
+        });
+        document.querySelector("#message").textContent = "保存成功";
+      } catch (e) {
+        document.querySelector("#message").textContent = e.message;
+      }
+    };
+    if (token)
+      load().catch(() => {
+        sessionStorage.removeItem(key);
+        document.querySelector("#login").hidden = false;
+      });
+  </script>
+</html>

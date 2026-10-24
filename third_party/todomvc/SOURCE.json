@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/tastejs/todomvc",
+  "revision": "ff43b02e59dfa604386bb382034b2cd07c2bcd8a",
+  "path": "examples/javascript-es6/src",
+  "sha256": {
+    "app.css": "f5b2eef45c7eeed7785c617ded94b532bd43fd7204fc043b9a54d4fabd31c03a",
+    "index.html": "6f27c58b3a383af7d060feca48c36866bbef216a1af2533298f6afe0fed50e16",
+    "app.js": "73ab5f66f5b770ff45def104783879d6f240bcfe4045973bfd2062aa67c7cd01",
+    "template.js": "3a471a881adeffe685dea40336d99ccf2ad517297e2b6e7a06c403606449e901",
+    "store.js": "82aed21b2203eeaf1c6bf1ad83e3adbdc1254c16f8490a45c588c835274124bd",
+    "model.js": "709229402f453eb7a69270d5272bdde20f041d038b019f0c55ff0a106d5127a9",
+    "controller.js": "1d4d56f4dd3c250bb64d234e24b50cb38bbdc6e807a0b2d6748af8cb7050ea8c",
+    "view.js": "399b57814a1a85f1316cf49eddb3220bad853b18077e903a7cab0101c22e00bb",
+    "helpers.js": "fededc622ffe04a0c518f41137394e8fa0e596fda964dc70dc2129450de06bab"
+  },
+  "modifications": "Served copy: explicit .js imports, remove webpack-only HMR and CSS imports; local presentation CSS. Store/model/controller/view logic retained."
+}

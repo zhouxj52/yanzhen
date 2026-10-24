@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#6262df" />
+    <title>验真 Yanzhen · 软件验收工作空间</title>
+    <link rel="icon" type="image/svg+xml" href="/static/brand.svg" />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar" aria-label="主导航">
+      <a class="brand" href="#overview"
+        ><img src="/static/brand.svg" width="32" height="32" alt="" /><strong
+          >验真<span>Yanzhen</span></strong
+        ><span class="brand-label">BETA</span></a
+      >
+      <div class="workspace-switch">
+        <div class="workspace-avatar">Y</div>
+        <div><strong>本地工作空间</strong><small>Local workspace</small></div>
+        <span class="status-dot"></span>
+      </div>
+      <div class="nav-caption">工作空间</div>
+      <nav class="main-nav">
+        <button class="nav-item active" data-view="overview">
+          <i data-icon="layout"></i><span>项目概览</span>
+        </button>
+        <button class="nav-item" data-view="workbench">
+          <i data-icon="flask"></i><span>验收工作台</span><kbd>N</kbd>
+        </button>
+        <button class="nav-item" data-view="history">
+          <i data-icon="history"></i><span>运行记录</span
+          ><b id="history-count">0</b>
+        </button>
+        <button class="nav-item" data-view="evidence">
+          <i data-icon="archive"></i><span>证据中心</span>
+        </button>
+      </nav>
+      <div class="nav-caption secondary-caption">资源</div>
+      <nav class="secondary-nav">
+        <button class="nav-item" data-view="guide">
+          <i data-icon="book"></i><span>使用指南</span></button
+        ><a class="nav-item" href="/docs" target="_blank" rel="noopener"
+          ><i data-icon="code"></i><span>API 文档</span
+          ><i data-icon="external" class="end-icon"></i
+        ></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="mode-card">
+          <span class="mode-icon"><i data-icon="shield"></i></span
+          ><strong>本地执行，证据可查</strong>
+          <p>模型调用已关闭。先把每一条<br />验收标准验证清楚。</p>
+          <button id="mode-guide">
+            了解验收流程 <i data-icon="arrow-right"></i>
+          </button>
+        </div>
+        <div class="workspace-user">
+          <div class="user-avatar">YZ</div>
+          <div>
+            <strong>本地开发环境</strong
+            ><small
+              ><span class="status-dot"></span
+              ><span id="service-status">正在连接服务</span></small
+            >
+          </div>
+          <span class="version">v0.2</span>
+        </div>
+      </div>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="topbar-location">
+          <button
+            class="icon-button"
+            id="toggle-sidebar"
+            aria-label="展开或收起侧栏"
+            aria-expanded="true"
+          >
+            <i data-icon="panel-left"></i></button
+          ><span class="topbar-divider"></span
+          ><span class="breadcrumb">工作空间</span
+          ><i data-icon="chevron-right" class="breadcrumb-chevron"></i
+          ><strong id="page-name">项目概览</strong>
+        </div>
+        <div class="topbar-actions">
+          <button class="global-search" id="open-search">
+            <i data-icon="search"></i><span>搜索运行记录…</span
+            ><kbd>Ctrl K</kbd></button
+          ><span class="environment-pill"
+            ><span class="status-dot"></span>本地环境</span
+          ><button class="icon-button" id="open-help" aria-label="打开使用指南">
+            <i data-icon="help"></i>
+          </button>
+          <div class="top-avatar" title="本地工作空间">Y</div>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <section id="view-overview" class="view">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">QUALITY WORKSPACE</div>
+              <h1>项目概览</h1>
+              <p>每一条需求，都有可验证的答案。</p>
+            </div>
+            <div class="heading-actions">
+              <button class="button secondary" id="refresh-overview">
+                <i data-icon="refresh"></i>刷新数据</button
+              ><button class="button primary" data-new-run>
+                <i data-icon="plus"></i>新建验收
+              </button>
+            </div>
+          </div>
+          <div class="project-banner">
+            <div class="project-symbol"><i data-icon="layers"></i></div>
+            <div class="project-banner-copy">
+              <div>
+                <h2>报销系统 + TodoMVC</h2>
+                <span class="tag neutral">内置演示项目</span>
+              </div>
+              <p>
+                权限隔离、状态流转与数据保存 ·
+                使用独立测试环境，保留完整执行证据
+              </p>
+            </div>
+            <span class="tag success"
+              ><span class="status-dot"></span>执行器已就绪</span
+            >
+          </div>
+          <div class="overview-metrics" id="overview-metrics"></div>
+          <div class="overview-grid">
+            <section class="card activity-card">
+              <div class="card-heading">
+                <div>
+                  <h2>验收活动</h2>
+                  <p>最近 14 次运行的检查结果</p>
+                </div>
+                <div class="segmented" aria-label="图表筛选">
+                  <button class="selected" data-chart-filter="all">全部</button
+                  ><button data-chart-filter="fail">含缺陷</button>
+                </div>
+              </div>
+              <div class="chart-legend">
+                <span><b class="legend-dot pass"></b>通过</span
+                ><span><b class="legend-dot fail"></b>发现缺陷</span
+                ><span><b class="legend-dot blocked"></b>受阻 / 待澄清</span>
+              </div>
+              <div id="activity-chart" class="activity-chart"></div>
+              <div class="chart-footer">
+                <i data-icon="info"></i><span>图表来自实际运行记录</span
+                ><span id="chart-count"></span>
+              </div>
+            </section>
+            <section class="card health-card">
+              <div class="card-heading">
+                <div>
+                  <h2>报销系统检查覆盖</h2>
+                  <p>当前项目支持的验收维度</p>
+                </div>
+                <i data-icon="shield" class="muted"></i>
+              </div>
+              <div class="coverage-list">
+                <div>
+                  <span class="coverage-icon purple"
+                    ><i data-icon="users"></i
+                  ></span>
+                  <div>
+                    <strong>角色与资源权限</strong
+                    ><small>本人、他人、管理员访问边界</small>
+                  </div>
+                  <span class="coverage-count">3 项</span>
+                </div>
+                <div>
+                  <span class="coverage-icon blue"
+                    ><i data-icon="workflow"></i
+                  ></span>
+                  <div>
+                    <strong>业务状态流转</strong
+                    ><small>已审批记录的重复提交保护</small>
+                  </div>
+                  <span class="coverage-count">1 项</span>
+                </div>
+                <div>
+                  <span class="coverage-icon teal"
+                    ><i data-icon="database"></i
+                  ></span>
+                  <div>
+                    <strong>数据持久化</strong
+                    ><small>保存、刷新与查询一致性</small>
+                  </div>
+                  <span class="coverage-count">1 项</span>
+                </div>
+              </div>
+              <div class="coverage-note">
+                <i data-icon="lock"></i>
+                <div>
+                  <strong>验收标准锁定</strong>
+                  <p>契约冻结后执行，修复定位器不会放宽断言。</p>
+                </div>
+              </div>
+              <button class="coverage-link" data-view="workbench">
+                查看验收工作台<i data-icon="arrow-right"></i>
+              </button>
+            </section>
+          </div>
+          <section class="card recent-card">
+            <div class="card-heading">
+              <div>
+                <h2>最近运行</h2>
+                <p>从结论追溯每一次检查与原始证据</p>
+              </div>
+              <button class="text-button" data-view="history">
+                查看全部 <i data-icon="arrow-right"></i>
+              </button>
+            </div>
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>运行任务</th>
+                    <th>状态</th>
+                    <th>检查结果</th>
+                    <th>运行时间</th>
+                    <th class="align-right">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-runs"></tbody>
+              </table>
+            </div>
+          </section>
+          <div class="overview-footnote">
+            <i data-icon="info"></i>统计口径：最近 50
+            次运行；受控场景结果不代表真实项目检出率。
+          </div>
+        </section>
+        <section id="view-workbench" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">ACCEPTANCE WORKBENCH</div>
+              <h1>验收工作台</h1>
+              <p>定义预期、冻结标准，再用实际执行形成结论。</p>
+            </div>
+            <button class="button secondary" id="new-draft">
+              <i data-icon="plus"></i>新建验收
+            </button>
+          </div>
+          <div class="scope-note">
+            <i data-icon="info"></i
+            ><span
+              >当前项目：<strong id="target-name">团队报销系统</strong> ·
+              所有运行使用独立的合成数据</span
+            ><b id="model-mode"><span class="status-dot"></span>离线规则模式</b>
+          </div>
+          <div class="steps">
+            <div class="step current" data-step="1">
+              <b>1</b>
+              <div><strong>定义需求</strong><small>描述预期行为</small></div>
+            </div>
+            <span class="step-line"></span>
+            <div class="step" data-step="2">
+              <b>2</b>
+              <div><strong>审阅并冻结</strong><small>确认验收标准</small></div>
+            </div>
+            <span class="step-line"></span>
+            <div class="step" data-step="3">
+              <b>3</b>
+              <div>
+                <strong>执行与取证</strong><small>形成可复核结论</small>
+              </div>
+            </div>
+          </div>
+          <div class="workspace-grid">
+            <section class="card requirement-card">
+              <div class="card-heading">
+                <h2>
+                  <span class="section-icon"><i data-icon="file-text"></i></span
+                  >需求输入
+                </h2>
+                <button class="text-button" id="load-example">
+                  <i data-icon="rotate"></i>载入示例
+                </button>
+              </div>
+              <div class="requirement-body">
+                <label class="field-label" for="requirements"
+                  >验收需求 <span class="required">*</span></label
+                ><textarea
+                  id="requirements"
+                  maxlength="16000"
+                  spellcheck="false"
+                  placeholder="描述角色、操作、前置条件与预期结果…"
+                ></textarea>
+                <div class="input-foot">
+                  <span>每条契约都会保留需求原文</span
+                  ><span id="char-count">0 字</span>
+                </div>
+                <label class="field-label" for="target">目标项目</label>
+                <select id="target" aria-label="目标项目">
+                  <option value="reimbursement">团队报销系统</option>
+                  <option value="todomvc">TodoMVC 官方开源任务管理示例</option>
+                </select>
+                <p class="field-help" id="target-help">隔离环境执行</p>
+                <label class="field-label" for="provider">分析方式</label
+                ><select id="provider">
+                  <option value="offline">离线规则解析</option>
+                  <option value="qwen">Qwen 模型接口</option>
+                </select>
+                <p class="field-help" id="provider-help">
+                  基础框架阶段，无需配置模型即可完整运行。
+                </p>
+                <button
+                  class="button primary full"
+                  id="analyze"
+                  data-testid="analyze"
+                >
+                  <i data-icon="sparkles"></i>生成验收契约<i
+                    data-icon="arrow-right"
+                  ></i>
+                </button>
+              </div>
+            </section>
+            <section class="card contract-card">
+              <div class="card-heading">
+                <h2>
+                  <span class="section-icon"
+                    ><i data-icon="list-check"></i></span
+                  >验收契约<span class="count" id="contract-count">0</span>
+                </h2>
+                <span class="status-pill neutral" id="bundle-status"
+                  >等待分析</span
+                >
+              </div>
+              <div id="contracts" class="contract-list"></div>
+              <div class="freeze-footer">
+                <div>
+                  <span><i data-icon="fingerprint"></i>内容完整性摘要</span
+                  ><code id="digest">等待生成契约</code>
+                </div>
+                <button
+                  class="button secondary"
+                  id="freeze"
+                  disabled
+                  data-testid="freeze"
+                >
+                  <i data-icon="lock"></i>确认并冻结
+                </button>
+              </div>
+            </section>
+          </div>
+          <section class="card execution-card">
+            <div class="execution-controls">
+              <div>
+                <h2>
+                  <span class="section-icon"><i data-icon="play"></i></span
+                  >执行验收
+                </h2>
+                <p>新建隔离环境，执行冻结契约并收集证据。</p>
+              </div>
+              <div class="run-options">
+                <select id="scenario" aria-label="测试实现版本"></select
+                ><label class="checkbox"
+                  ><input
+                    type="checkbox"
+                    id="browser"
+                    checked
+                  />包含浏览器检查</label
+                ><button
+                  class="button primary"
+                  id="run"
+                  disabled
+                  data-testid="run"
+                >
+                  <i data-icon="play"></i>开始验收
+                </button>
+              </div>
+            </div>
+            <div class="result-bar">
+              <div>
+                <span class="run-dot" id="run-dot"></span
+                ><strong id="run-status">准备就绪</strong
+                ><code id="run-id">等待冻结契约</code>
+              </div>
+              <div class="result-actions">
+                <button class="text-button" id="cancel" disabled>
+                  <i data-icon="square"></i>取消任务</button
+                ><button class="text-button" id="integrity" disabled>
+                  <i data-icon="shield-check"></i>校验证据</button
+                ><button class="text-button" id="replay" disabled>
+                  <i data-icon="rotate"></i>在新环境重放 ↻</button
+                ><a
+                  id="export"
+                  class="text-button disabled"
+                  aria-disabled="true"
+                  ><i data-icon="download"></i>下载证据包</a
+                >
+              </div>
+            </div>
+            <div id="metrics" class="metrics">
+              <div>
+                <span><b class="legend-dot pass"></b>通过</span
+                ><strong data-metric="pass">—</strong
+                ><small>符合验收标准</small>
+              </div>
+              <div>
+                <span><b class="legend-dot fail"></b>发现缺陷</span
+                ><strong data-metric="fail">—</strong
+                ><small>产品行为不符合预期</small>
+              </div>
+              <div>
+                <span><b class="legend-dot blocked"></b>执行受阻</span
+                ><strong data-metric="blocked">—</strong
+                ><small>环境或工具不可用</small>
+              </div>
+              <div>
+                <span><b class="legend-dot unclear"></b>需要澄清</span
+                ><strong data-metric="unclear">—</strong
+                ><small>需求或适配尚不明确</small>
+              </div>
+            </div>
+            <section
+              id="reproductions"
+              class="reproduction-panel"
+              hidden
+            ></section>
+            <section class="repair-panel" id="repair-panel" hidden>
+              <div>
+                <h2>修复标准审查</h2>
+                <p>
+                  审查当前选中契约的受限执行计划；通过审查的候选不会自动应用。
+                </p>
+              </div>
+              <div class="repair-controls">
+                <select id="repair-case" aria-label="修复候选类型">
+                  <option value="locator">仅调整定位器与等待</option>
+                  <option value="assertion">尝试放宽断言</option>
+                  <option value="role">尝试更换身份</option>
+                  <option value="skip">尝试跳过检查</option></select
+                ><button id="review-repair" class="button secondary">
+                  审查候选
+                </button>
+              </div>
+              <div id="repair-verdict" role="status"></div>
+            </section>
+            <div class="results-layout">
+              <div class="results-main">
+                <div class="table-scroll">
+                  <table class="results-table data-table">
+                    <thead>
+                      <tr>
+                        <th>验收项</th>
+                        <th>判定结果</th>
+                        <th>证据</th>
+                        <th>耗时</th>
+                      </tr>
+                    </thead>
+                    <tbody id="results"></tbody>
+                  </table>
+                </div>
+                <div id="comparison" hidden></div>
+                <details class="event-panel">
+                  <summary>
+                    <span><i data-icon="terminal"></i>执行轨迹</span
+                    ><span id="event-count">0 个事件</span>
+                  </summary>
+                  <ol id="events"></ol>
+                </details>
+              </div>
+              <aside class="evidence-panel" id="evidence"></aside>
+            </div>
+          </section>
+        </section>
+        <section id="view-history" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">RUN HISTORY</div>
+              <h1>运行记录</h1>
+              <p>每一次执行都有记录，每一个结论都能回溯。</p>
+            </div>
+            <div class="heading-actions">
+              <button class="button secondary" id="refresh-history">
+                <i data-icon="refresh"></i>刷新记录</button
+              ><button class="button primary" data-new-run>
+                <i data-icon="plus"></i>新建验收
+              </button>
+            </div>
+          </div>
+          <section class="card">
+            <div class="history-toolbar">
+              <div class="search-field">
+                <i data-icon="search"></i
+                ><input
+                  id="history-search"
+                  aria-label="搜索运行记录"
+                  placeholder="搜索运行编号、场景…"
+                />
+              </div>
+              <select id="history-status" aria-label="筛选运行状态">
+                <option value="all">全部状态</option>
+                <option value="completed">已完成</option>
+                <option value="running">运行中</option>
+                <option value="cancelled">已取消</option>
+                <option value="error">已中断</option></select
+              ><span id="history-visible-count" class="muted"></span>
+            </div>
+            <div id="history-list"></div>
+          </section>
+        </section>
+        <section id="view-evidence" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">EVIDENCE LIBRARY</div>
+              <h1>证据中心</h1>
+              <p>汇集冻结契约、执行报告与原始轨迹，支持完整性校验。</p>
+            </div>
+            <button class="button secondary" id="refresh-evidence">
+              <i data-icon="refresh"></i>刷新证据
+            </button>
+          </div>
+          <div class="evidence-info">
+            <i data-icon="shield-check"></i>
+            <div>
+              <strong>结论有依据，交付有凭证</strong>
+              <p>
+                证据包包含需求契约、执行报告及已生成的截图和 trace。新格式使用
+                SHA-256 清单检查文件完整性。
+              </p>
+            </div>
+          </div>
+          <div class="evidence-library" id="evidence-library"></div>
+        </section>
+        <section id="view-guide" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">GETTING STARTED</div>
+              <h1>使用指南</h1>
+              <p>用一次完整的验收，了解从需求到证据的工作流程。</p>
+            </div>
+            <button class="button primary" data-new-run>
+              <i data-icon="plus"></i>开始一次验收
+            </button>
+          </div>
+          <div class="guide-grid">
+            <article class="card guide">
+              <div class="guide-hero">
+                <span class="guide-symbol"><i data-icon="book"></i></span>
+                <div>
+                  <span class="eyebrow">QUICK START</span>
+                  <h2>三步完成第一次验收</h2>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>
+                  <b>1</b>
+                  <div>
+                    <h3>描述需求</h3>
+                    <p>
+                      载入报销系统示例，明确角色、操作和预期行为，生成验收契约。
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <b>2</b>
+                  <div>
+                    <h3>审阅并冻结标准</h3>
+                    <p>
+                      核对需求引用、角色和预期，确认后冻结。执行过程保持标准不变。
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <b>3</b>
+                  <div>
+                    <h3>执行、取证与重放</h3>
+                    <p>
+                      选择正确或受控缺陷版本开始验收。查看原始证据，并在新环境中验证缺陷能否重现。
+                    </p>
+                  </div>
+                </li>
+              </ol>
+              <h2>理解四种检查判定</h2>
+              <div class="verdict-guide">
+                <div>
+                  <span class="verdict pass">通过</span>
+                  <p>实际证据支持符合需求。</p>
+                </div>
+                <div>
+                  <span class="verdict fail">发现缺陷</span>
+                  <p>产品行为与冻结标准不一致。</p>
+                </div>
+                <div>
+                  <span class="verdict blocked">执行受阻</span>
+                  <p>环境或工具无法完成验证。</p>
+                </div>
+                <div>
+                  <span class="verdict unclear">需要澄清</span>
+                  <p>需求含糊或缺少执行适配。</p>
+                </div>
+              </div>
+            </article>
+            <aside class="guide-aside">
+              <section class="card guide">
+                <h2>当前工作空间</h2>
+                <dl class="system-info">
+                  <div>
+                    <dt>目标项目</dt>
+                    <dd>报销系统 / TodoMVC</dd>
+                  </div>
+                  <div>
+                    <dt>执行方式</dt>
+                    <dd>本地浏览器 + 接口</dd>
+                  </div>
+                  <div>
+                    <dt>模型调用</dt>
+                    <dd>默认关闭</dd>
+                  </div>
+                  <div>
+                    <dt>数据范围</dt>
+                    <dd>隔离的合成数据</dd>
+                  </div>
+                </dl>
+                <p class="field-help">
+                  当前版本适配报销系统与固定版本
+                  TodoMVC，尚未接入任意网站或大模型。
+                </p>
+              </section>
+              <section class="card guide">
+                <h2>证据包里有什么？</h2>
+                <ul class="file-list">
+                  <li><i data-icon="file-json"></i>冻结契约与执行报告</li>
+                  <li><i data-icon="image"></i>截图与浏览器 trace</li>
+                  <li><i data-icon="fingerprint"></i>文件校验清单</li>
+                  <li><i data-icon="code"></i>独立环境重放脚本</li>
+                </ul>
+                <p class="field-help">
+                  数据库与登录 token
+                  不导出。重放脚本需本地验真服务运行；校验清单不等于数字签名。
+                </p>
+              </section>
+            </aside>
+          </div>
+        </section>
+        <footer class="app-footer">
+          <span
+            >验真 Yanzhen<span class="footer-separator">·</span
+            >让软件交付有据可验</span
+          ><span
+            ><span class="status-dot"></span>本地工作空间<span
+              class="footer-separator"
+              >/</span
+            >v0.2</span
+          >
+        </footer>
+      </main>
+    </div>
+    <dialog id="search-dialog" class="search-dialog">
+      <div class="palette-input">
+        <i data-icon="search"></i
+        ><input
+          id="palette-search"
+          aria-label="搜索任务"
+          placeholder="搜索运行编号、场景名称…"
+          autocomplete="off"
+        /><button class="icon-button" id="close-search" aria-label="关闭搜索">
+          <i data-icon="x"></i>
+        </button>
+      </div>
+      <div class="palette-label">最近运行 · 最多显示 8 项</div>
+      <div id="palette-results"></div>
+      <div class="palette-footer">
+        <span>点击结果打开运行详情</span><kbd>Esc 关闭</kbd>
+      </div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script src="/static/innovation.js" defer></script>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

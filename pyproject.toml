@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yanzhen"
+version = "0.2.0"
+description = "Requirement contracts, evidence-based acceptance, and reproducible defects"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "fastapi==0.159.1",
+  "uvicorn==0.54.0",
+  "httpx==0.28.1",
+  "pydantic==2.14.1",
+  "playwright==1.64.0",
+  "mcp>=1.0,<2",
+]
+
+[project.optional-dependencies]
+test = ["pytest==9.1.1"]
+
+[project.scripts]
+yanzhen = "yanzhen.cli:main"
+yanzhen-mcp = "yanzhen.mcp_server:main"
+
+[tool.setuptools.packages.find]
+include = ["yanzhen*"]
+
+[tool.setuptools.package-data]
+yanzhen = ["web/*.html", "web/*.css", "web/*.js", "web/*.svg", "web/todomvc/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

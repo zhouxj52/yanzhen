@@ -1,0 +1,16 @@
+# Merge this mcp section into an existing JiuwenSwarm config.yaml.
+# Format verified against the official jiuwenswarm 0.2.3 wheel.
+# Start the acceptance service first: .\scripts\start.ps1
+mcp:
+  servers:
+    - name: yanzhen
+      enabled: true
+      transport: stdio
+      command: D:/openjiuwen/.venv/Scripts/python.exe
+      args: ["-m", "yanzhen.mcp_server"]
+      cwd: D:/openjiuwen
+      timeout_s: 120
+      env:
+        YZ_PORT: "8765"
+        TEMP: D:/openjiuwen/.tmp
+        TMP: D:/openjiuwen/.tmp
