@@ -75,6 +75,8 @@ class TodoExecutor:
                 evidence.append(Evidence(id="capture-error",kind="observation",description="辅助截图失败",data={"error":type(exc).__name__}))
         except Exception as exc:
             verdict, summary = Verdict.BLOCKED, f"执行受阻：{type(exc).__name__}: {str(exc)[:120]}"
+        if verdict in {Verdict.PASS,Verdict.FAIL}:
+            evidence.append(Evidence(id='action-witness-'+contract.id,kind='observation',description='受信执行器归档的业务动作见证',data={'business_action':contract.kind,'role':contract.role,'executor':'todomvc','evidence_ids':[e.id for e in evidence]}))
         return CheckResult(contract_id=contract.id,kind=contract.kind,title=contract.title,verdict=verdict,summary=summary,evidence=evidence,replay_steps=["打开独立浏览器环境。","新增唯一标题的任务。","按冻结契约核对新增、完成或刷新后的结果。"],duration_ms=int((time.perf_counter()-started)*1000))
 
 

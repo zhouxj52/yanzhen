@@ -1,0 +1,78 @@
+{
+  "automated_tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "87",
+    "time": "37.256",
+    "timestamp": "2026-10-26T14:31:21.824528+08:00",
+    "hostname": "LAPTOP-QEOJKIQF"
+  },
+  "test_xml_sha256": "4490d0125003761e047fa6ed15d226451b082f0f35a7d6b194106ca1f13dc485",
+  "ui": {
+    "status": "passed",
+    "first_visit_guidance": true,
+    "source_upload_limit_explicit": true,
+    "real_connection_check": true,
+    "allowlist_error_actionable": true,
+    "ordinary_flow_without_json": true,
+    "real_http_and_browser_execution": true,
+    "manual_mode_explicit": true,
+    "contract_revision": true,
+    "per_action_approval": true,
+    "cross_layer_evidence": true,
+    "trusted_trace_minimization": true,
+    "same_oracle_repair_validation": true,
+    "archive_hashes": true,
+    "responsive": "1480/900/390",
+    "model_calls": 0,
+    "page_errors": []
+  },
+  "mcp": {
+    "status": "passed",
+    "transport": "stdio",
+    "tools": [
+      "analyze_requirements",
+      "cancel_acceptance",
+      "draft_verification_contracts",
+      "freeze_contracts",
+      "get_acceptance_report",
+      "get_verification_report",
+      "register_verification_target",
+      "replay_defects",
+      "run_acceptance",
+      "run_verification",
+      "verify_acceptance_evidence"
+    ],
+    "run_id": "a592605d18de4544871db14913dacb8f",
+    "replay_id": "8de5e82e8dbc4628809cee44a231ef7d",
+    "generic_read_only_run": "f1334bec8f78497790d4decdb2101dab",
+    "scope": "MCP tool integration only; Swarm/model validation is recorded separately"
+  },
+  "live_report_ui": {
+    "status": "passed",
+    "historical_deeplink": true,
+    "actual_swarm_run": "c4a53bf6dde449ad9609f1d40dbd8b90",
+    "visible_target_matches_run": true,
+    "page_errors": [],
+    "model_calls": 0
+  },
+  "benchmark_cases": 7,
+  "real_model_integration_file": "real-model-integration.json",
+  "remote_ci": "NOT RUN",
+  "comparisons_and_ablations": "NOT RUN; see local-kernel.json",
+  "source_branch": "codex/verifyagent-core",
+  "onboarding_connection_check": {
+    "status": "passed",
+    "model_calls": 0,
+    "cases": [
+      "ready local project",
+      "unapproved origin",
+      "unsupported public target",
+      "authentication required",
+      "HTTP 503",
+      "unreachable service"
+    ]
+  }
+}

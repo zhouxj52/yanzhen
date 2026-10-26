@@ -67,6 +67,25 @@ def test_private_database_and_arbitrary_files_cannot_be_exported():
         assert response.status_code == 404
 
 
+def test_legacy_repair_review_ignores_caller_witness_and_requires_executor_archive():
+    async def scenario():
+        bundle=await analyze(AnalyzeRequest(requirements=DEFAULT_REQUIREMENTS))
+        save_bundle(bundle);freeze_bundle(bundle.id,bundle.digest)
+        run=create_run(RunRequest(bundle_id=bundle.id,scenario='healthy',browser=False))
+        contract=bundle.contracts[0]
+        plan={'contract_id':contract.id,'role':contract.role,'action':contract.kind,'assertions':[contract.expected],'locator':'original','wait_ms':0,'skip':False}
+        body={'original':plan,'candidate':{**plan,'locator':'new'},'witnessed_action':contract.kind}
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://fixture') as client:
+            before=await client.post(f'/api/runs/{run.id}/repair-review/{contract.id}',json=body)
+            assert not before.json()['accepted']
+            await execute(run.id,'http://fixture',client)
+            body['witnessed_action']='a fabricated caller claim'
+            after=await client.post(f'/api/runs/{run.id}/repair-review/{contract.id}',json=body)
+            assert after.json()['accepted']
+            assert '归档执行器' in after.json()['scope']
+    asyncio.run(scenario())
+
+
 def test_trace_resources_redact_tokens(tmp_path):
     path = tmp_path / "trace.zip"
     secret = "synthetic-session-secret"

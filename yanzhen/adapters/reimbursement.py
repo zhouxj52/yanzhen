@@ -164,6 +164,8 @@ class Executor:
             summary = f"执行工具受阻：{type(exc).__name__}。详细信息见运行事件。"
             event(self.run, "blocked", f"{contract.id}: {type(exc).__name__}: {str(exc)[:300]}")
             verdict = Verdict.BLOCKED
+        if verdict in {Verdict.PASS,Verdict.FAIL}:
+            evidence.append(Evidence(id='action-witness-'+contract.id,kind='observation',description='受信执行器归档的业务动作见证',data={'business_action':contract.kind,'role':contract.role,'executor':'reimbursement','evidence_ids':[e.id for e in evidence]}))
         return CheckResult(contract_id=contract.id, kind=contract.kind, title=contract.title, verdict=verdict, summary=summary, evidence=evidence, replay_steps=steps, duration_ms=int((time.perf_counter()-started)*1000))
 
 

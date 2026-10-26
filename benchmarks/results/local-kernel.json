@@ -1,0 +1,282 @@
+{
+  "status": "passed",
+  "scope": "Controlled manual-plan kernel regression, not an autonomous LLM benchmark or real-world generalization study",
+  "cases": [
+    {
+      "case": "authorization/healthy",
+      "expected": "pass",
+      "actual": "pass",
+      "run_id": "316f4dae95a049b2b6178af607279ce3",
+      "bundle_id": "2493ee49254745cfa044d558f3baff0f",
+      "contract_digest": "a481cc364aad14d3c73ac73cd8c053ac9ddf8cfe562c04e4c0aca407e27d0e37",
+      "elapsed_ms": 828,
+      "target_version": "local-orders-notes-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    },
+    {
+      "case": "authorization/auth_bug",
+      "expected": "fail",
+      "actual": "fail",
+      "run_id": "53e5a57f033849baa65b2b64df9d4ba1",
+      "bundle_id": "d283339371f14f4a9a1939ab706dd677",
+      "contract_digest": "4bbf868a3935722ea103e8490db11411805d16b7dd05ecf7290210a28c869656",
+      "elapsed_ms": 879,
+      "target_version": "local-orders-notes-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    },
+    {
+      "case": "persistence/healthy",
+      "expected": "pass",
+      "actual": "pass",
+      "run_id": "bdbff00fc93a46af9291ac894d5b4aa0",
+      "bundle_id": "07e464a38b3a4bc0a4e56004232a53f7",
+      "contract_digest": "4681e6ac9eb043df6575e2b0397dc4d39b99b4b56db85a8627eca0e0ad8e002b",
+      "elapsed_ms": 559,
+      "target_version": "local-orders-notes-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    },
+    {
+      "case": "persistence/persistence_bug",
+      "expected": "fail",
+      "actual": "fail",
+      "run_id": "9709a8e095a844ef8c53af329b41125e",
+      "bundle_id": "4cc259ed33974d2bb826d29052659e90",
+      "contract_digest": "26e35097cf6de56f59d3c24af635ebb8b8c9f86a8c599b01827fc24e113bd447",
+      "elapsed_ms": 574,
+      "target_version": "local-orders-notes-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    },
+    {
+      "case": "inventory-holdout/healthy",
+      "expected": "pass",
+      "actual": "pass",
+      "run_id": "8162acda22364810a5eef197848e44ef",
+      "elapsed_ms": 370,
+      "target_version": "holdout-inventory-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    },
+    {
+      "case": "inventory-holdout/negative",
+      "expected": "fail",
+      "actual": "fail",
+      "run_id": "76621cb3463a4a4bae167a1e744401f6",
+      "elapsed_ms": 359,
+      "target_version": "holdout-inventory-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    },
+    {
+      "case": "inventory-holdout/unavailable",
+      "expected": "blocked",
+      "actual": "blocked",
+      "run_id": "315e6cfb806b455f9fe1c238aed2b3fa",
+      "elapsed_ms": 390,
+      "target_version": "holdout-inventory-v1",
+      "mode": "explicit_manual_plan_actual_tools"
+    }
+  ],
+  "metrics": {
+    "contract_generation_validity": {
+      "status": "NOT RUN",
+      "reason": "No real model inference"
+    },
+    "requirement_coverage": {
+      "status": "NOT RUN",
+      "reason": "No independently labeled natural-language corpus"
+    },
+    "controlled_defect_detection_rate": 1.0,
+    "controlled_false_positive_rate": 0.0,
+    "reproduction_success": {
+      "successful": 1,
+      "attempted_cases": 1,
+      "independent_confirmations": 2
+    },
+    "planned_step_reduction_rate": 0.5,
+    "invalid_repair_interception": {
+      "blocked": 1,
+      "tested": 1
+    },
+    "mean_execution_ms": 565.5714285714286,
+    "llm_tokens": 0,
+    "estimated_llm_cost": 0
+  },
+  "reduction": {
+    "status": "verified",
+    "fingerprint": "7360fc1358ff95ad93a8eae40bf74ab6164999e200f64e266beea2f2ef0412bb",
+    "original_steps": [
+      "save",
+      "read"
+    ],
+    "steps": [
+      "save"
+    ],
+    "removed": 1,
+    "confirmations": 2,
+    "required_confirmations": 2,
+    "trials": [
+      {
+        "phase": "baseline",
+        "steps": [
+          "save",
+          "read"
+        ],
+        "matched": true,
+        "outcome": "reproduced",
+        "fingerprint": "7360fc1358ff95ad93a8eae40bf74ab6164999e200f64e266beea2f2ef0412bb",
+        "observations": [
+          {
+            "run_id": "2b78f0d1218249b889263a37f02db62a",
+            "verdict": "fail",
+            "contract_digest": "26e35097cf6de56f59d3c24af635ebb8b8c9f86a8c599b01827fc24e113bd447"
+          }
+        ],
+        "reason": ""
+      },
+      {
+        "phase": "deletion",
+        "steps": [
+          "read"
+        ],
+        "matched": false,
+        "outcome": "blocked",
+        "fingerprint": "",
+        "observations": [
+          {
+            "run_id": "f501e47fb7b540d5acb27d87a4b1fcae",
+            "verdict": "blocked",
+            "contract_digest": "26e35097cf6de56f59d3c24af635ebb8b8c9f86a8c599b01827fc24e113bd447"
+          }
+        ],
+        "reason": ""
+      },
+      {
+        "phase": "deletion",
+        "steps": [
+          "save"
+        ],
+        "matched": true,
+        "outcome": "reproduced",
+        "fingerprint": "7360fc1358ff95ad93a8eae40bf74ab6164999e200f64e266beea2f2ef0412bb",
+        "observations": [
+          {
+            "run_id": "0f97bdf14ad64b3a926aea3bc891654e",
+            "verdict": "fail",
+            "contract_digest": "26e35097cf6de56f59d3c24af635ebb8b8c9f86a8c599b01827fc24e113bd447"
+          }
+        ],
+        "reason": ""
+      },
+      {
+        "phase": "confirmation",
+        "steps": [
+          "save"
+        ],
+        "matched": true,
+        "outcome": "reproduced",
+        "fingerprint": "7360fc1358ff95ad93a8eae40bf74ab6164999e200f64e266beea2f2ef0412bb",
+        "observations": [
+          {
+            "run_id": "2b37f087d501435a8bb666ac17471efb",
+            "verdict": "fail",
+            "contract_digest": "26e35097cf6de56f59d3c24af635ebb8b8c9f86a8c599b01827fc24e113bd447"
+          }
+        ],
+        "reason": ""
+      },
+      {
+        "phase": "confirmation",
+        "steps": [
+          "save"
+        ],
+        "matched": true,
+        "outcome": "reproduced",
+        "fingerprint": "7360fc1358ff95ad93a8eae40bf74ab6164999e200f64e266beea2f2ef0412bb",
+        "observations": [
+          {
+            "run_id": "bb50baad3cb54685bcc396e70dc771e2",
+            "verdict": "fail",
+            "contract_digest": "26e35097cf6de56f59d3c24af635ebb8b8c9f86a8c599b01827fc24e113bd447"
+          }
+        ],
+        "reason": ""
+      }
+    ],
+    "budget": 10,
+    "minimality": "仅在给定动作集合和试验预算内验证，不承诺全局最小",
+    "fresh_fixture_each_trial": true,
+    "contract_id": "durable-note",
+    "source_run": "9709a8e095a844ef8c53af329b41125e",
+    "source_trace_hash": "4c8fa39982fea8b8e9b5144e7fa7905cceb1ec0d6e24cb8937dd8f657d70af6f",
+    "trial_run_ids": [
+      "2b78f0d1218249b889263a37f02db62a",
+      "f501e47fb7b540d5acb27d87a4b1fcae",
+      "0f97bdf14ad64b3a926aea3bc891654e",
+      "2b37f087d501435a8bb666ac17471efb",
+      "bb50baad3cb54685bcc396e70dc771e2"
+    ],
+    "original_planned_steps": 2,
+    "reduced_planned_steps": 1,
+    "replays": 5,
+    "elapsed_ms": 1411,
+    "actions": [
+      {
+        "id": "save",
+        "kind": "http_request",
+        "actor": "anonymous",
+        "locator": null,
+        "url": "api/note",
+        "value": null,
+        "method": "PATCH",
+        "json_body": {
+          "note": "验真独立验收"
+        },
+        "depends_on": [],
+        "timeout_ms": 4000,
+        "retries": 0
+      }
+    ],
+    "fixed_probe_count": 2,
+    "scope": "Only planned actions are deleted. Frozen precondition, checkpoint and final probes remain part of every trial; they are not included in planned-step counts.",
+    "backend_isolation": "Fixture v1.0 creates independent backend state for each executor-issued namespace"
+  },
+  "repair_run_id": "e7625283e00049a7a185dafbcaca0f7b",
+  "same_oracle_repair": {
+    "original_run": "9709a8e095a844ef8c53af329b41125e",
+    "same_contract": true,
+    "all_regressions_pass": true,
+    "original_had_defect": true,
+    "mode": "external target / executor revalidation; no automatic source patch was applied",
+    "verified": true
+  },
+  "comparisons": {
+    "baseline_A": {
+      "status": "RUN",
+      "definition": "Fixed human-authored DSL plan through the deterministic kernel; freeze/probes retained"
+    },
+    "baseline_B": {
+      "status": "NOT RUN",
+      "reason": "Real LLM static-plan baseline not implemented/run in this slice"
+    },
+    "full_agent": {
+      "status": "NOT RUN",
+      "reason": "Separate comparative protocol not run; live DeepSeek and bounded Swarm smoke runs are recorded separately"
+    }
+  },
+  "ablations": {
+    "no_replanning": {
+      "status": "NOT RUN",
+      "reason": "Requires a separately reviewed real-model experiment protocol"
+    },
+    "no_cross_layer_evidence": {
+      "status": "NOT RUN",
+      "reason": "Requires a separately reviewed real-model experiment protocol"
+    },
+    "no_minimization": {
+      "status": "NOT RUN",
+      "reason": "Requires a separately reviewed real-model experiment protocol"
+    },
+    "no_repair_review": {
+      "status": "NOT RUN",
+      "reason": "Requires a separately reviewed real-model experiment protocol"
+    }
+  }
+}

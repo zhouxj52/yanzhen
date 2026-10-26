@@ -76,6 +76,9 @@ async def analyze(request: AnalyzeRequest, client: httpx.AsyncClient | None = No
             "id仅用英文字母、数字、下划线、连字符，长度不超过50。不得输出可执行代码。"
         )
         owned = client is None
+        reservation = None
+        paid_usage = None
+        paid_ok = False
         client = client or httpx.AsyncClient(timeout=90, trust_env=False)
         try:
             headers = {"Authorization": f"Bearer {config['key']}"} if config["key"] else {}
@@ -86,10 +89,13 @@ async def analyze(request: AnalyzeRequest, client: httpx.AsyncClient | None = No
             }
             if request.provider == "deepseek":
                 body["thinking"] = {"type": "disabled"}
+            from .verifyagent.budget import reserve
+            reservation=reserve(request.provider,config['model'],body['messages'],body['max_tokens'])
             response = await client.post(config["base_url"] + "/chat/completions", headers=headers, json=body)
             if response.status_code >= 400:
                 raise ValueError(f"模型接口返回 HTTP {response.status_code}；请检查模型名称、凭据和兼容接口配置。")
             payload = response.json()
+            paid_usage=payload.get('usage',{})
             choice = payload["choices"][0]
             if choice.get("finish_reason") == "length":
                 raise ValueError("模型输出被截断，未生成完整契约；请缩短需求后重试。")
@@ -102,9 +108,12 @@ async def analyze(request: AnalyzeRequest, client: httpx.AsyncClient | None = No
             data = json.loads(text)
             contracts = [Contract.model_validate(item) for item in data["contracts"]]
             usage = payload.get("usage", {})
+            paid_ok = True
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise ValueError("模型未返回有效验收契约；未降级或伪造成功。") from exc
         finally:
+            from .verifyagent.budget import finish
+            finish(reservation,'completed' if paid_ok else 'error',paid_usage)
             if owned:
                 await client.aclose()
     bundle = Bundle(id=uuid.uuid4().hex, requirements=request.requirements, provider=request.provider, model=model, contracts=contracts, usage=usage)

@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>验真 · 开始项目验收</title>
+    <link rel="icon" href="/static/brand.svg" />
+    <link rel="preload" href="/static/fonts/yanzhen-sans-sc.woff2?v=1" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/studio.css" />
+    <link rel="stylesheet" href="/static/glass.css" />
+    <link rel="stylesheet" href="/static/verifyagent.css?v=ink-6" />
+  </head>
+  <body class="va-app">
+    <aside class="sidebar" aria-label="主导航">
+      <a class="brand" href="/static/verifyagent.html">
+        <img src="/static/brand.svg" width="36" height="36" alt="" />
+        <span class="va-brand-copy"><strong>验真</strong><span>软件验收工作台</span></span>
+      </a>
+      <div class="va-nav-section">
+        <div class="nav-caption">工作台</div>
+        <nav class="main-nav" aria-label="验收操作">
+          <a class="nav-item active" href="/static/verifyagent.html" data-va-nav="start" aria-current="page"><svg class="va-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg><span>开始验收</span></a>
+          <a class="nav-item" href="/static/verifyagent.html?view=history" data-va-nav="history" id="va-show-history"><svg class="va-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span>验收记录</span></a>
+        </nav>
+      </div>
+      <div class="sidebar-bottom">
+        <p class="va-sidebar-note">先确认标准，再用证据验收。</p>
+        <div class="workspace-user"><span class="status-dot"></span><strong id="va-service">正在连接服务</strong></div>
+      </div>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <a href="/static/verifyagent.html" class="va-home-link"
+          >验真 / 项目验收</a
+        ><span id="va-mode" class="muted">准备一次新的验收</span>
+      </header>
+      <nav class="va-mobile-tabs" aria-label="快捷导航"><a class="active" href="/static/verifyagent.html" data-va-nav="start" aria-current="page">开始验收</a><a class="" href="/static/verifyagent.html?view=history" data-va-nav="history" id="va-mobile-history">验收记录</a></nav>
+      <main>
+        <section
+          id="va-welcome"
+          class="va-welcome"
+          aria-labelledby="va-welcome-title"
+        >
+          <div class="va-welcome-copy">
+            <span class="va-eyebrow">让交付有据可查</span>
+            <h1 id="va-welcome-title">
+              软件有没有做到，<br />按你的要求验一遍。
+            </h1>
+            <p class="va-lead">
+              给出项目的运行地址，写下它应该做到什么。<br
+                class="va-desktop-break"
+              />验真会实际操作项目，交付检查结果、截图和复现步骤。
+            </p>
+            <div class="va-welcome-actions">
+              <button id="va-own-project" class="button primary">
+                验收我的项目 <span aria-hidden="true">↗</span></button
+              ><button id="va-try-demo" class="button secondary">
+                先体验一个示例
+              </button>
+            </div>
+            <p class="va-entry-scope">
+              <span class="va-dot"></span>支持本机 / 内网的 Web 与 API 项目<span
+                class="va-scope-divider"
+                >·</span
+              >不需要公网部署
+            </p>
+            <p id="va-welcome-status" class="va-field-help" role="status"></p>
+          </div>
+          <aside class="va-preparation" aria-label="开始前需要准备什么">
+            <span class="va-small-label">你需要准备</span>
+            <ol>
+              <li>
+                <span>01</span>
+                <div>
+                  <strong>一个能打开的项目地址</strong>
+                  <p>先运行你的项目，例如 <code>http://127.0.0.1:3000</code></p>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <strong>你想验收的具体要求</strong>
+                  <p>例如：保存备注后，刷新页面内容仍然保留。</p>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <strong>必要的测试条件</strong>
+                  <p>需要登录的项目，请准备测试身份和可使用的测试数据。</p>
+                </div>
+              </li>
+            </ol>
+            <div class="va-source-note">
+              <strong>手上只有源码 ZIP 或 GitHub 链接？</strong>
+              <p>
+                请先按项目说明在本地运行，再填写地址。当前还不能上传源码并自动启动。
+              </p>
+            </div>
+          </aside>
+        </section>
+
+        <section
+          id="va-demo-picker"
+          class="va-demo-picker"
+          aria-label="选择体验示例"
+          hidden
+        >
+          <div class="va-section-intro">
+            <div>
+              <h2>先用准备好的项目走一遍</h2>
+              <p>
+                不用上传文件或配置模型。载入后审阅清单，再实际运行；需要改数据时会逐步征求确认。
+              </p>
+            </div>
+            <button id="va-demo-close" class="text-button">收起</button>
+          </div>
+          <div class="va-demo-options">
+            <button data-example="persistence">
+              <span class="va-demo-icon" aria-hidden="true">↻</span
+              ><strong>保存后，数据真的还在吗？</strong
+              ><span>实际填写 → 保存 → 刷新 → 独立查询</span
+              ><b>体验保存检查 →</b></button
+            ><button data-example="authorization">
+              <span class="va-demo-icon" aria-hidden="true">⌁</span
+              ><strong>用户能看到别人的订单吗？</strong
+              ><span>使用两个测试身份，检查订单访问边界</span
+              ><b>体验权限检查 →</b>
+            </button>
+          </div>
+          <p class="va-hint">
+            示例使用人工预先编写的检查清单和操作，不调用大模型；检查和证据来自真实执行。
+          </p>
+        </section>
+
+        <div id="va-workspace" hidden>
+          <div class="va-workspace-heading">
+            <div>
+              <span class="va-eyebrow" id="va-flow-kind">新的项目验收</span>
+              <h1 id="va-flow-title">先接入你的项目。</h1>
+              <p id="va-flow-description">
+                项目先运行起来，再告诉我们要检查什么。
+              </p>
+            </div>
+            <button class="text-button" id="va-new">返回开始</button>
+          </div>
+          <ol class="va-stages" aria-label="验收流程">
+            <li><span>1</span>接入项目</li>
+            <li><span>2</span>确认检查清单</li>
+            <li><span>3</span>实际执行</li>
+            <li><span>4</span>查看结果</li>
+          </ol>
+          <p id="va-error" class="va-error" role="alert" hidden></p>
+
+          <section
+            id="va-setup-panel"
+            class="va-setup-layout"
+            aria-label="接入项目"
+          >
+            <form id="va-intake-form" class="card va-card" novalidate>
+              <div class="card-heading">
+                <div>
+                  <h2>你的项目，在哪里运行？</h2>
+                  <p>填写待验收项目的地址，随后粘贴验收要求。</p>
+                </div>
+                <span class="va-label">01 / 04</span>
+              </div>
+              <div class="va-body">
+                <div id="va-example-note" class="va-notice" hidden></div>
+                <label for="va-url"
+                  >项目运行地址 <span class="va-required">必填</span></label
+                >
+                <div class="va-address-row">
+                  <input
+                    id="va-url"
+                    type="url"
+                    placeholder="http://127.0.0.1:3000"
+                    autocomplete="url"
+                    aria-describedby="va-url-help va-connection"
+                    required
+                  /><button
+                    id="va-check-target"
+                    type="button"
+                    class="button secondary"
+                  >
+                    检查连接
+                  </button>
+                </div>
+                <p id="va-url-help" class="va-field-help">
+                  填写本机或内网 IP
+                  地址。这里不是源码链接，也不是验真工作台自身的地址。
+                </p>
+                <div
+                  id="va-connection"
+                  class="va-connection"
+                  role="status"
+                  aria-live="polite"
+                  hidden
+                ></div>
+                <div class="va-interface-row">
+                  <label for="va-interface">项目类型</label
+                  ><select id="va-interface">
+                    <option value="web">Web 网站 · 操作浏览器检查</option>
+                    <option value="api">API 服务 · 调用接口检查</option>
+                  </select>
+                </div>
+                <label for="va-requirements"
+                  >你希望它做到什么？
+                  <span class="va-required">必填</span></label
+                >
+                <textarea
+                  id="va-requirements"
+                  rows="6"
+                  placeholder="写具体的功能与预期结果，可以直接粘贴需求。&#10;&#10;例如：用户保存备注后，刷新页面，原来的内容仍然存在。"
+                  aria-describedby="va-requirement-help"
+                  required
+                ></textarea>
+                <p id="va-requirement-help" class="va-field-help">
+                  一次先检查一组明确的要求。不要填写密码或 API 密钥。
+                </p>
+                <label class="va-check"
+                  ><input
+                    id="va-authorized"
+                    type="checkbox"
+                  />我有权在这个测试项目中进行验收，允许按清单检查测试数据。</label
+                >
+                <details id="va-settings" class="va-advanced">
+                  <summary>
+                    高级设置
+                    <span>需要登录、接口说明，或切换验收方式时再展开</span>
+                  </summary>
+                  <label for="va-provider">验收方式</label
+                  ><select id="va-provider">
+                    <option value="deepseek">
+                      DeepSeek · AI 整理清单与规划
+                    </option>
+                    <option value="qwen">Qwen · AI 整理清单与规划</option>
+                    <option value="jiuwenswarm">
+                      JiuwenSwarm · 受限 AI 规划
+                    </option>
+                    <option value="manual">手动配置 / 示例 · 不调用模型</option>
+                  </select>
+                  <p class="va-field-help">
+                    AI
+                    方式会调用服务器已配置的模型。手动方式需要完整检查清单和操作；示例会自动填好。
+                  </p>
+                  <label for="va-api-descriptions"
+                    >接口说明地址（可选，每行一个，最多 3 个）</label
+                  ><textarea
+                    id="va-api-descriptions"
+                    rows="2"
+                    placeholder="例如 api/schema；地址仍须位于项目授权范围内"
+                  ></textarea>
+                  <details class="va-developer">
+                    <summary>开发者：测试身份与数据隔离</summary>
+                    <p>
+                      登录向导尚未通用化。身份只填写服务器环境变量名称，不填写凭据值；连接检查使用配置中的第一个测试身份。
+                    </p>
+                    <label for="va-identities">测试身份引用 JSON</label
+                    ><textarea id="va-identities" rows="3">{}</textarea
+                    ><label for="va-namespace"
+                      >测试数据隔离请求头（目标须明确支持）</label
+                    ><input
+                      id="va-namespace"
+                      placeholder="没有此协议时，不保证后端数据重置"
+                    />
+                  </details>
+                  <details id="va-manual-settings" class="va-developer">
+                    <summary>开发者：手动检查清单与操作</summary>
+                    <label for="va-supplied">手动检查清单 JSON</label
+                    ><textarea
+                      id="va-supplied"
+                      rows="7"
+                      spellcheck="false"
+                      placeholder='{"contracts": [...], "clarification_questions": []}'
+                    ></textarea
+                    ><label for="va-actions">手动操作计划 JSON</label
+                    ><textarea
+                      id="va-actions"
+                      rows="6"
+                      spellcheck="false"
+                      placeholder="仅手动和示例方式使用"
+                    ></textarea>
+                  </details>
+                </details>
+                <div class="va-form-footer">
+                  <p
+                    id="va-model-note"
+                    class="va-field-help"
+                    aria-live="polite"
+                  >
+                    正在读取可用的验收方式…
+                  </p>
+                  <button class="button primary" id="va-draft" type="submit">
+                    下一步：生成检查清单 <span aria-hidden="true">→</span>
+                  </button>
+                  <p id="va-next-help" class="va-field-help">
+                    先填项目地址与具体要求，再确认测试授权。
+                  </p>
+                </div>
+              </div>
+            </form>
+            <aside class="va-setup-help">
+              <h3>接下来会发生什么？</h3>
+              <ol class="va-help-steps">
+                <li>
+                  <strong>先看懂要求</strong>
+                  <p>系统整理出具体检查项，歧义会先向你确认。</p>
+                </li>
+                <li>
+                  <strong>你来确认清单</strong>
+                  <p>确认后锁定标准，执行时不偷偷降低要求。</p>
+                </li>
+                <li>
+                  <strong>操作项目，保留证据</strong>
+                  <p>修改数据前逐步确认。结束后查看通过项、问题与截图。</p>
+                </li>
+              </ol>
+              <details>
+                <summary>项目还没启动，怎么办？</summary>
+                <p>
+                  按照项目自身的运行说明启动前端和所需服务，确认浏览器可以打开，再把该地址填到这里。验真暂不代替你安装或启动源码。
+                </p>
+              </details>
+              <details>
+                <summary>为什么地址可能不能用？</summary>
+                <p>
+                  地址必须在服务器的允许列表中。当前不支持公网域名、复杂第三方登录或跨来源联测。
+                </p>
+                <p id="va-allowlist" class="va-field-help"></p>
+                <details>
+                  <summary>管理员配置说明</summary>
+                  <p>
+                    在服务器本地配置
+                    <code>YZ_VERIFY_ALLOWED_ORIGINS</code>，登记项目的协议、IP
+                    与端口后重启服务。不要填入凭据。
+                  </p>
+                </details>
+              </details>
+            </aside>
+          </section>
+
+          <section id="va-review-panel" class="card va-card" hidden>
+            <div class="card-heading">
+              <div>
+                <h2>这些，就是接下来要检查的事。</h2>
+                <p>请核对预期结果和补充条件，确认后才会实际操作项目。</p>
+              </div>
+              <button id="va-back-setup" class="text-button">
+                修改项目或需求
+              </button>
+            </div>
+            <div class="va-body">
+              <p id="va-contract-state" class="va-hint"></p>
+              <div class="va-review-context">
+                <span>你的原始要求</span>
+                <p id="va-review-requirements"></p>
+              </div>
+              <div id="va-contract-summary"></div>
+              <label class="va-check va-confirm-check"
+                ><input
+                  id="va-confirm"
+                  type="checkbox"
+                />我已读过检查项，确认预期结果和列出的测试条件。</label
+              ><button class="button primary" id="va-freeze" disabled>
+                确认清单，准备执行 <span aria-hidden="true">→</span></button
+              ><button
+                class="button primary"
+                id="va-review-to-execution"
+                hidden
+              >
+                清单已锁定，返回执行 →
+              </button>
+              <p class="va-field-help">
+                确认后保存固定版本。以后调整标准，会生成新版本并重新确认。
+              </p>
+              <details id="va-contract-advanced" class="va-advanced">
+                <summary>高级：查看或编辑结构化标准</summary>
+                <textarea
+                  id="va-contract-editor"
+                  rows="15"
+                  spellcheck="false"
+                  aria-label="结构化验收标准 JSON"
+                ></textarea
+                ><button class="button secondary" id="va-revise" disabled>
+                  保存为新版本
+                </button>
+                <p id="va-digest" class="va-hash"></p>
+              </details>
+            </div>
+          </section>
+
+          <section
+            id="va-execution-panel"
+            class="card va-card va-execution"
+            hidden
+          >
+            <div class="card-heading">
+              <div>
+                <h2>实际执行与操作记录</h2>
+                <p id="va-run-state" role="status" aria-live="polite">
+                  清单已确认，点击开始执行。
+                </p>
+              </div>
+              <div class="va-actions">
+                <button class="button secondary" id="va-show-review">
+                  查看已确认清单
+                </button>
+                <button class="button secondary" id="va-cancel" disabled>
+                  取消执行</button
+                ><button class="button primary" id="va-start" disabled>
+                  开始执行验收
+                </button>
+              </div>
+            </div>
+            <div class="va-body">
+              <div id="va-ready-summary" class="va-notice"></div>
+              <div id="va-approval" class="va-approval" hidden>
+                <strong>这一步需要你的确认</strong>
+                <p id="va-approval-description"></p>
+                <p class="va-field-help">
+                  此操作可能修改测试数据，批准后才会继续。
+                </p>
+                <details>
+                  <summary>查看这个动作的完整参数</summary>
+                  <pre id="va-approval-action"></pre>
+                </details>
+                <div class="va-actions">
+                  <button class="button primary" id="va-approve">
+                    批准这一步</button
+                  ><button class="button secondary" id="va-deny">
+                    拒绝并停止
+                  </button>
+                </div>
+              </div>
+              <div class="va-grid">
+                <div>
+                  <h3>当前正在做什么</h3>
+                  <p id="va-plan" class="va-current-plan">还没有执行动作。</p>
+                  <div id="va-log" class="va-log"></div>
+                </div>
+                <div>
+                  <h3>实际操作记录</h3>
+                  <div id="va-trace" class="va-log">
+                    <p class="va-hint">
+                      执行后，这里会出现真实的操作、截图或错误。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="va-result-panel" class="card va-card" hidden>
+            <div class="card-heading">
+              <div>
+                <h2>验收结果</h2>
+                <p id="va-result-summary">
+                  每项结论都来自已确认的标准和实际观测。
+                </p>
+              </div>
+              <a id="va-export" class="button secondary" hidden
+                >下载报告与证据 ZIP</a
+              >
+            </div>
+            <div class="va-body">
+              <div id="va-results" class="va-results"></div>
+              <div id="va-screenshots" class="va-screenshots"></div>
+              <details class="va-advanced">
+                <summary>查看证据之间的支持与矛盾</summary>
+                <p id="va-graph-summary" class="va-hint"></p>
+                <div id="va-graph" class="va-graph"></div>
+              </details>
+              <details id="va-repair-tools" class="va-advanced">
+                <summary>开发者：复现问题或检查修复版本</summary>
+                <p class="va-field-help">
+                  修复版本需要事先运行。这里不会自动修改业务源码。
+                </p>
+                <label class="va-check"
+                  ><input
+                    id="va-replay-consent"
+                    type="checkbox"
+                  />允许在具备隔离协议的测试环境中重复原动作，最多 12 次</label
+                >
+                <div id="va-reproductions"></div>
+                <div class="va-row">
+                  <input
+                    id="va-repair-target"
+                    type="url"
+                    aria-label="修复版本运行地址"
+                    placeholder="修复版本的测试地址"
+                  /><button class="button secondary" id="va-repair" disabled>
+                    按原清单检查修复版
+                  </button>
+                </div>
+              </details>
+            </div>
+          </section>
+        </div>
+
+        <details id="va-history-panel" class="va-history-panel" hidden>
+          <summary>
+            <span>验收记录</span><span>已归档的实际检查结果</span>
+          </summary>
+          <div class="va-history-heading">
+            <p class="va-field-help">
+              历史结果只读取归档，不会重新执行或调用模型。
+            </p>
+            <button class="text-button" id="va-refresh">刷新记录</button>
+          </div>
+          <div id="va-history" class="va-history"></div>
+        </details>
+        <footer class="app-footer">
+          验真 Yanzhen · 先确认标准，再用真实行为验收
+        </footer>
+      </main>
+    </div>
+    <script src="/static/liquid-glass.js" defer></script>
+    <script type="module" src="/static/verifyagent.js?v=workspace-5"></script>
+  </body>
+</html>

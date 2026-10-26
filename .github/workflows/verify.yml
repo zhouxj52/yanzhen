@@ -1,0 +1,23 @@
+name: Verification kernel
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[test]'
+      # Only official E2A schemas/codec are exercised in protocol unit tests.
+      # This does not install or claim to run a full JiuwenSwarm agent server.
+      - run: python -m pip install --no-deps jiuwenswarm==0.2.3 websockets==17.3
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m pytest -o addopts='' --junitxml=.artifacts/tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: .artifacts/tests.xml

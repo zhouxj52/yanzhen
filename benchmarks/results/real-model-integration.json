@@ -1,0 +1,1300 @@
+{
+  "scope": "Live integration records, not a statistical A/B evaluation",
+  "contract_review": "Real model candidate followed by explicit engineering edits and human approval; original and revised versions retained",
+  "frozen_contract_id": "e1ea19d55dfd4a15b1762cf1008860f9",
+  "frozen_digest": "87b494aa5602e242fa88a2a0d2b8aa4fad56991a33e750055e3e7de19b7efc46",
+  "runs": [
+    {
+      "id": "8d7609133989489198dbf693f8ec0ee6",
+      "planner": "deepseek",
+      "contract_digest": "87b494aa5602e242fa88a2a0d2b8aa4fad56991a33e750055e3e7de19b7efc46",
+      "summary": {
+        "pass": 0,
+        "fail": 1,
+        "blocked": 0,
+        "unclear": 0
+      },
+      "trace": [
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "nav-root",
+            "kind": "navigate",
+            "actor": "anonymous",
+            "locator": null,
+            "url": ".",
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [],
+            "timeout_ms": 4000,
+            "retries": 0
+          },
+          "action_digest": "0a25f3e19d530ea73073c3e4c23500c53945da3a88b1eaf82cf713ff438f4882",
+          "ok": true,
+          "observed_value": {
+            "url": "http://127.0.0.1:8771/app/persistence_bug/",
+            "status": 200
+          },
+          "error": null,
+          "evidence_id": "3d32c63465634f65a1229c9ee6251292",
+          "duration_ms": 64,
+          "timestamp": "2026-10-26T03:16:40.092086+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "fill-note",
+            "kind": "fill",
+            "actor": "anonymous",
+            "locator": {
+              "by": "label",
+              "value": "备注",
+              "role": "button"
+            },
+            "url": null,
+            "value": "验真独立验收",
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "nav-root"
+            ],
+            "timeout_ms": 4000,
+            "retries": 0
+          },
+          "action_digest": "b8740ad84fd9bd5ed45158e95a3464a4a57248f74b93f054a863ddc1d81901c7",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "dcc2342e3e0340e683bb2c5f3ddc1a68",
+          "duration_ms": 29,
+          "timestamp": "2026-10-26T03:16:41.574809+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "click-save",
+            "kind": "click",
+            "actor": "anonymous",
+            "locator": {
+              "by": "role",
+              "value": "保存",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "fill-note"
+            ],
+            "timeout_ms": 4000,
+            "retries": 0
+          },
+          "action_digest": "4a92f05fcb0c35263fc7a278b28bea4ab429e8fb690ee4c8cd0433541af264a5",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "88db4573d3454164bac4a54c8ad1dd6e",
+          "duration_ms": 52,
+          "timestamp": "2026-10-26T03:16:43.073150+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "wait-status",
+            "kind": "wait_for",
+            "actor": "anonymous",
+            "locator": {
+              "by": "css",
+              "value": "[role=status]",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "click-save"
+            ],
+            "timeout_ms": 4000,
+            "retries": 0
+          },
+          "action_digest": "5b50e63022f07b086842302f035187443edd3f4e8ab201841bb498af5d89aa6b",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "7bda1a56fd1947d0946c9c87520c837c",
+          "duration_ms": 32,
+          "timestamp": "2026-10-26T03:16:44.740282+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "reload-page",
+            "kind": "reload",
+            "actor": "anonymous",
+            "locator": null,
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "wait-status"
+            ],
+            "timeout_ms": 4000,
+            "retries": 0
+          },
+          "action_digest": "fef82cf0679eb7167f73484c08c2fc2f3ffd14d071210938798e72c9bbccfc25",
+          "ok": true,
+          "observed_value": {
+            "url": "http://127.0.0.1:8771/app/persistence_bug/",
+            "status": 200
+          },
+          "error": null,
+          "evidence_id": "473fde00915d41f5bc1a3cff37c0050f",
+          "duration_ms": 53,
+          "timestamp": "2026-10-26T03:16:46.522914+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "get-api-note",
+            "kind": "http_request",
+            "actor": "anonymous",
+            "locator": null,
+            "url": "api/note",
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "reload-page"
+            ],
+            "timeout_ms": 4000,
+            "retries": 0
+          },
+          "action_digest": "678b4867f5c2cbf412d7ac27a96f08ebcf4dca8aea3b06360d6af54cb2e5fd3c",
+          "ok": true,
+          "observed_value": {
+            "status": 200,
+            "body": {
+              "note": ""
+            },
+            "url": "http://127.0.0.1:8771/app/persistence_bug/api/note",
+            "method": "GET"
+          },
+          "error": null,
+          "evidence_id": "a659e0f757b949138c6834464a8c3d34",
+          "duration_ms": 189,
+          "timestamp": "2026-10-26T03:16:48.222486+00:00"
+        }
+      ],
+      "results": [
+        {
+          "contract_id": "note-persistence",
+          "title": "保存备注后刷新与重新查询均保持相同内容",
+          "verdict": "fail",
+          "assertions": [
+            {
+              "assertion_id": "readback_matches_after_save",
+              "source": {
+                "quote": "用户保存备注后，刷新页面和重新查询时，备注必须保持与保存时相同。",
+                "basis": "direct",
+                "explanation": "保存后页面回显应与保存输入一致。"
+              },
+              "evidence_ids": [
+                "2e365ba2d3b9420db80290e48258d769"
+              ],
+              "verdict": "pass",
+              "actual": "验真独立验收",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "readback_matches_after_reload",
+              "source": {
+                "quote": "用户保存备注后，刷新页面和重新查询时，备注必须保持与保存时相同。",
+                "basis": "direct",
+                "explanation": "刷新页面后页面回显仍应保持保存内容。"
+              },
+              "evidence_ids": [
+                "01e916dd3044454da306617ccb69c91e"
+              ],
+              "verdict": "fail",
+              "actual": "",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "api_note_matches_after_reload",
+              "source": {
+                "quote": "允许使用本测试应用公开的 GET 接口独立查询，页面与接口均应保留相同输入。",
+                "basis": "direct",
+                "explanation": "刷新后通过公开 GET 接口查询应返回相同备注。"
+              },
+              "evidence_ids": [
+                "ae8ae18ca92d4297b487be03ef6a72e4"
+              ],
+              "verdict": "fail",
+              "actual": "",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "acknowledgement_visible",
+              "source": {
+                "quote": "等待页面出现“保存成功”",
+                "basis": "direct",
+                "explanation": ""
+              },
+              "evidence_ids": [
+                "60dd7e79a80545afa948eb628af7173b"
+              ],
+              "verdict": "pass",
+              "actual": "保存成功",
+              "expected": "保存成功",
+              "operator": "contains"
+            }
+          ],
+          "fingerprint": "aeb21ebff0ba97379e29f4a93072d8d1f0e6a25d0906c36a9bed7a23695503e2"
+        }
+      ],
+      "usage": {
+        "calls": [
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "f640fe6802bc45f4afe90d891f563a52",
+              "timestamp": "2026-10-26T03:16:38.748763+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 15093,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.062186",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 2781,
+              "completion_tokens": 46,
+              "total_tokens": 2827,
+              "prompt_tokens_details": {
+                "cached_tokens": 128
+              },
+              "prompt_cache_hit_tokens": 128,
+              "prompt_cache_miss_tokens": 2653
+            },
+            "duration_ms": 1276,
+            "call_record": "754be0f73a584dc0a98b2224b0b8e3d2.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "c145ca9529874182b72b1c6b2e4958be",
+              "timestamp": "2026-10-26T03:16:40.108285+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 15544,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.063088",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 2967,
+              "completion_tokens": 70,
+              "total_tokens": 3037,
+              "prompt_tokens_details": {
+                "cached_tokens": 2304
+              },
+              "prompt_cache_hit_tokens": 2304,
+              "prompt_cache_miss_tokens": 663
+            },
+            "duration_ms": 1375,
+            "call_record": "6abfb1054a2d4f15913046c7f5ded3f8.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "7ee22465bf0c46ad920cd31d554445b9",
+              "timestamp": "2026-10-26T03:16:41.589810+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 16041,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.064082",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 3158,
+              "completion_tokens": 79,
+              "total_tokens": 3237,
+              "prompt_tokens_details": {
+                "cached_tokens": 2560
+              },
+              "prompt_cache_hit_tokens": 2560,
+              "prompt_cache_miss_tokens": 598
+            },
+            "duration_ms": 1369,
+            "call_record": "366daf26e5d14fd484d74101e73158c4.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "527719ace12f4649b690a0584479ede1",
+              "timestamp": "2026-10-26T03:16:43.095743+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 16795,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.065590",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 3414,
+              "completion_tokens": 106,
+              "total_tokens": 3520,
+              "prompt_tokens_details": {
+                "cached_tokens": 2048
+              },
+              "prompt_cache_hit_tokens": 2048,
+              "prompt_cache_miss_tokens": 1366
+            },
+            "duration_ms": 1616,
+            "call_record": "4f5592fe4e2c4b7bba54a771af828387.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "28b8cb2f6ee04a20970f9baed084936b",
+              "timestamp": "2026-10-26T03:16:44.755334+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 17283,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.066566",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 3597,
+              "completion_tokens": 77,
+              "total_tokens": 3674,
+              "prompt_tokens_details": {
+                "cached_tokens": 3072
+              },
+              "prompt_cache_hit_tokens": 3072,
+              "prompt_cache_miss_tokens": 525
+            },
+            "duration_ms": 1708,
+            "call_record": "a6634f73a0fc4dd385e6557709b25657.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "8b1eff7d42b34e17b25936c7f5f436ab",
+              "timestamp": "2026-10-26T03:16:46.540579+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 17479,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.066958",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 3715,
+              "completion_tokens": 108,
+              "total_tokens": 3823,
+              "prompt_tokens_details": {
+                "cached_tokens": 2688
+              },
+              "prompt_cache_hit_tokens": 2688,
+              "prompt_cache_miss_tokens": 1027
+            },
+            "duration_ms": 1497,
+            "call_record": "95479b9387ba45a594b47a1f8e7cf492.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "deepseek",
+            "status": "completed",
+            "cost_reservation": {
+              "id": "6ff08e65c54a4d3f862dde6e4370ddf2",
+              "timestamp": "2026-10-26T03:16:48.237739+00:00",
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "input_token_upper": 17861,
+              "max_output_tokens": 4000,
+              "input_cny_per_million": "2",
+              "output_cny_per_million": "8",
+              "reserved_upper_cny": "0.067722",
+              "status": "reserved"
+            },
+            "usage": {
+              "prompt_tokens": 3892,
+              "completion_tokens": 52,
+              "total_tokens": 3944,
+              "prompt_tokens_details": {
+                "cached_tokens": 3456
+              },
+              "prompt_cache_hit_tokens": 3456,
+              "prompt_cache_miss_tokens": 436
+            },
+            "duration_ms": 1609,
+            "call_record": "12899bb0017c4567be214e63b954aa3a.json"
+          }
+        ],
+        "prompt_tokens": 23524,
+        "completion_tokens": 538,
+        "usage_complete": true,
+        "estimated_cost_usd": null,
+        "cost_basis": "not configured",
+        "wall_time_ms": 12025
+      },
+      "archive_sha256": "90c58e3d387fdd2b3abe160a3be3ca7c2b87b664c271eeb71b22a0a2d83e6328",
+      "artifact_hash_validation": {
+        "valid": true,
+        "run_id": "8d7609133989489198dbf693f8ec0ee6",
+        "files_checked": 12,
+        "errors": []
+      }
+    },
+    {
+      "id": "da1fc5607ccc46f783186d130fbd7935",
+      "planner": "jiuwenswarm",
+      "contract_digest": "87b494aa5602e242fa88a2a0d2b8aa4fad56991a33e750055e3e7de19b7efc46",
+      "summary": {
+        "pass": 0,
+        "fail": 1,
+        "blocked": 0,
+        "unclear": 0
+      },
+      "trace": [
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "nav_app",
+            "kind": "navigate",
+            "actor": "anonymous",
+            "locator": null,
+            "url": ".",
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [],
+            "timeout_ms": 5000,
+            "retries": 0
+          },
+          "action_digest": "79819190358b2054eea33e87887c69965f026aafb2e48f4f2520947a8484c49f",
+          "ok": true,
+          "observed_value": {
+            "url": "http://127.0.0.1:8771/app/persistence_bug/",
+            "status": 200
+          },
+          "error": null,
+          "evidence_id": "8987850dde3643d2878a9f4fd637e533",
+          "duration_ms": 63,
+          "timestamp": "2026-10-26T03:29:18.364412+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "fill_note",
+            "kind": "fill",
+            "actor": "anonymous",
+            "locator": {
+              "by": "label",
+              "value": "备注",
+              "role": "button"
+            },
+            "url": null,
+            "value": "验真独立验收",
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "nav_app"
+            ],
+            "timeout_ms": 5000,
+            "retries": 0
+          },
+          "action_digest": "ddf4ef7d984c09eee08a4f478def0a441076281f13b25f7df932382eabba821d",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "084bd26b44834bb3a72c83c51164b9b0",
+          "duration_ms": 38,
+          "timestamp": "2026-10-26T03:29:19.827669+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "click_save",
+            "kind": "click",
+            "actor": "anonymous",
+            "locator": {
+              "by": "role",
+              "value": "保存",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "fill_note"
+            ],
+            "timeout_ms": 5000,
+            "retries": 0
+          },
+          "action_digest": "de569e10ff2139706d4fb4f20a55e8777655a80c001bd83e73ab07251ffb94e5",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "c834a98988974f43bf4e7b86b4f4c62e",
+          "duration_ms": 54,
+          "timestamp": "2026-10-26T03:29:21.309531+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "wait_status_saved",
+            "kind": "wait_for",
+            "actor": "anonymous",
+            "locator": {
+              "by": "css",
+              "value": "[role=status]",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "click_save"
+            ],
+            "timeout_ms": 5000,
+            "retries": 0
+          },
+          "action_digest": "502a3975dd87c022b0bc2e3dfeec9de1b747dfcfdc513cb72c5d0c4187c892f6",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "7c2880a2cbb8488f93d80d14c082e2dd",
+          "duration_ms": 32,
+          "timestamp": "2026-10-26T03:29:23.478016+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "reload_after_save",
+            "kind": "reload",
+            "actor": "anonymous",
+            "locator": null,
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "wait_status_saved"
+            ],
+            "timeout_ms": 5000,
+            "retries": 0
+          },
+          "action_digest": "3ce91437adc3fc0a0949d9b2a63466085d74401de8ff904915ebdf09683fba67",
+          "ok": true,
+          "observed_value": {
+            "url": "http://127.0.0.1:8771/app/persistence_bug/",
+            "status": 200
+          },
+          "error": null,
+          "evidence_id": "e7b1f8c6a025493c87703190eb66bbaa",
+          "duration_ms": 59,
+          "timestamp": "2026-10-26T03:29:25.293152+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "get_api_note",
+            "kind": "http_request",
+            "actor": "anonymous",
+            "locator": null,
+            "url": "api/note",
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "reload_after_save"
+            ],
+            "timeout_ms": 5000,
+            "retries": 0
+          },
+          "action_digest": "a610a2daca57fece92f3a5b921c867b0de815ee0ff9fe3d1b492ea84a4d537bd",
+          "ok": true,
+          "observed_value": {
+            "status": 200,
+            "body": {
+              "note": ""
+            },
+            "url": "http://127.0.0.1:8771/app/persistence_bug/api/note",
+            "method": "GET"
+          },
+          "error": null,
+          "evidence_id": "e4c2b50bc39d47d7897892479e8bbea3",
+          "duration_ms": 243,
+          "timestamp": "2026-10-26T03:29:27.260281+00:00"
+        }
+      ],
+      "results": [
+        {
+          "contract_id": "note-persistence",
+          "title": "保存备注后刷新与重新查询均保持相同内容",
+          "verdict": "fail",
+          "assertions": [
+            {
+              "assertion_id": "readback_matches_after_save",
+              "source": {
+                "quote": "用户保存备注后，刷新页面和重新查询时，备注必须保持与保存时相同。",
+                "basis": "direct",
+                "explanation": "保存后页面回显应与保存输入一致。"
+              },
+              "evidence_ids": [
+                "5c99e421d871498fba7f9769699ed78e"
+              ],
+              "verdict": "pass",
+              "actual": "验真独立验收",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "readback_matches_after_reload",
+              "source": {
+                "quote": "用户保存备注后，刷新页面和重新查询时，备注必须保持与保存时相同。",
+                "basis": "direct",
+                "explanation": "刷新页面后页面回显仍应保持保存内容。"
+              },
+              "evidence_ids": [
+                "22d36e17cece44c3a27c3095efd52877"
+              ],
+              "verdict": "fail",
+              "actual": "",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "api_note_matches_after_reload",
+              "source": {
+                "quote": "允许使用本测试应用公开的 GET 接口独立查询，页面与接口均应保留相同输入。",
+                "basis": "direct",
+                "explanation": "刷新后通过公开 GET 接口查询应返回相同备注。"
+              },
+              "evidence_ids": [
+                "e96b8c70350246bbb35988d919d1fb1f"
+              ],
+              "verdict": "fail",
+              "actual": "",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "acknowledgement_visible",
+              "source": {
+                "quote": "等待页面出现“保存成功”",
+                "basis": "direct",
+                "explanation": ""
+              },
+              "evidence_ids": [
+                "ea1b1d45f61b4fbaad09823c3d55669a"
+              ],
+              "verdict": "pass",
+              "actual": "保存成功",
+              "expected": "保存成功",
+              "operator": "contains"
+            }
+          ],
+          "fingerprint": "aeb21ebff0ba97379e29f4a93072d8d1f0e6a25d0906c36a9bed7a23695503e2"
+        }
+      ],
+      "usage": {
+        "calls": [
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3332,
+              "completion_tokens": 93,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 2906,
+            "call_record": "f848c55eaf9e446ea55a659283369a69.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3520,
+              "completion_tokens": 88,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1346,
+            "call_record": "e9d44202993941749f51dfffd574e812.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3712,
+              "completion_tokens": 97,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1331,
+            "call_record": "fcc311566a434465b7caad202259732e.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3979,
+              "completion_tokens": 141,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 2118,
+            "call_record": "5ca93c0676de4bd49e9e189fba5ec574.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4179,
+              "completion_tokens": 116,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1743,
+            "call_record": "881d1233c3254bacbac448d11ca61ab5.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4301,
+              "completion_tokens": 141,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1711,
+            "call_record": "2289d2bae8ed473fb594f571e40149e2.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4485,
+              "completion_tokens": 67,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1456,
+            "call_record": "a1ad6d222f444bc0b46ce619a146d17a.json"
+          }
+        ],
+        "prompt_tokens": 27508,
+        "completion_tokens": 743,
+        "usage_complete": true,
+        "estimated_cost_usd": null,
+        "cost_basis": "not configured",
+        "wall_time_ms": 14327
+      },
+      "archive_sha256": "1ff5e5fb3f4366c195d370e8593389340359d2dfc5558e9600f65371a2b67ca2",
+      "artifact_hash_validation": {
+        "valid": true,
+        "run_id": "da1fc5607ccc46f783186d130fbd7935",
+        "files_checked": 12,
+        "errors": []
+      }
+    },
+    {
+      "id": "c4a53bf6dde449ad9609f1d40dbd8b90",
+      "planner": "jiuwenswarm",
+      "contract_digest": "87b494aa5602e242fa88a2a0d2b8aa4fad56991a33e750055e3e7de19b7efc46",
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "blocked": 0,
+        "unclear": 0
+      },
+      "trace": [
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "nav_root",
+            "kind": "navigate",
+            "actor": "anonymous",
+            "locator": null,
+            "url": ".",
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "f92276d5d46ed82f72470b693aa7290aa2692432d78d78d0938828a84b3424e4",
+          "ok": true,
+          "observed_value": {
+            "url": "http://127.0.0.1:8771/app/live_drift/",
+            "status": 200
+          },
+          "error": null,
+          "evidence_id": "8adab0a6c2b54b2da812271830c9d00a",
+          "duration_ms": 61,
+          "timestamp": "2026-10-26T03:40:34.854412+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "fill_note",
+            "kind": "fill",
+            "actor": "anonymous",
+            "locator": {
+              "by": "label",
+              "value": "备注",
+              "role": "textbox"
+            },
+            "url": null,
+            "value": "验真独立验收",
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "nav_root"
+            ],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "46f1bfe83e9045fffafd7386ff4a5433d218dd0c1211abe711920999401037bc",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "14b8266bce424f44a47843eee52b5164",
+          "duration_ms": 40,
+          "timestamp": "2026-10-26T03:40:36.767650+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "click_save",
+            "kind": "click",
+            "actor": "anonymous",
+            "locator": {
+              "by": "role",
+              "value": "保存",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "fill_note"
+            ],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "5a87a85f350972e8718168c54c0e371dd324d9547faaea885e515975db5c67fa",
+          "ok": false,
+          "observed_value": null,
+          "error": {
+            "type": "TimeoutError",
+            "message": "Locator.click: Timeout 8000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"保存\", exact=True)\n    - locator resolved to <button id=\"save\">保存</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n    - performing click action\n    - <html lang=\"zh-CN\">…</html> intercepts pointer events\n  - retrying click action\n    - waiting for element to be visible, enabled and stable\n  - element was detached from the DOM, retrying\n",
+            "category": "tool"
+          },
+          "evidence_id": "57085fa7986c49b4bff046b2a8714af9",
+          "duration_ms": 8038,
+          "timestamp": "2026-10-26T03:40:46.633628+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "click_apply_changes",
+            "kind": "click",
+            "actor": "anonymous",
+            "locator": {
+              "by": "role",
+              "value": "应用更改",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "fill_note"
+            ],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "8477267ad9bab9a6687e211f065e182f18e963ed647598d7d3813803d1d75a65",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "477d8d8a66ca4374a4e3c8014cb83213",
+          "duration_ms": 59,
+          "timestamp": "2026-10-26T03:40:48.055980+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "wait_status_saved",
+            "kind": "wait_for",
+            "actor": "anonymous",
+            "locator": {
+              "by": "css",
+              "value": "[role=status]",
+              "role": "button"
+            },
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "click_apply_changes"
+            ],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "3c16d811dbb9ad50e4124dbad999793c7f2abb118139a55ada53cffac04ff8e8",
+          "ok": true,
+          "observed_value": {
+            "action_completed": true
+          },
+          "error": null,
+          "evidence_id": "3dd75945626e46afaad4471472cb92e0",
+          "duration_ms": 37,
+          "timestamp": "2026-10-26T03:40:49.817700+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "reload_after_save",
+            "kind": "reload",
+            "actor": "anonymous",
+            "locator": null,
+            "url": null,
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "wait_status_saved"
+            ],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "cd3185345a756c64b99102ee0bf624916af8b110ed2c77c3b527b5084770e42d",
+          "ok": true,
+          "observed_value": {
+            "url": "http://127.0.0.1:8771/app/live_drift/",
+            "status": 200
+          },
+          "error": null,
+          "evidence_id": "e676d02986ad4a94a01fc03eaa622ff4",
+          "duration_ms": 55,
+          "timestamp": "2026-10-26T03:40:51.318451+00:00"
+        },
+        {
+          "contract_id": "note-persistence",
+          "action": {
+            "id": "get_api_note",
+            "kind": "http_request",
+            "actor": "anonymous",
+            "locator": null,
+            "url": "api/note",
+            "value": null,
+            "method": "GET",
+            "json_body": null,
+            "depends_on": [
+              "reload_after_save"
+            ],
+            "timeout_ms": 8000,
+            "retries": 0
+          },
+          "action_digest": "97f9c23bc6f8eca40cafeb19d5e59762c87ab1eed40a2c0dcb033a80faf99578",
+          "ok": true,
+          "observed_value": {
+            "status": 200,
+            "body": {
+              "note": "验真独立验收"
+            },
+            "url": "http://127.0.0.1:8771/app/live_drift/api/note",
+            "method": "GET"
+          },
+          "error": null,
+          "evidence_id": "e56912523e764e0ba6866d5e43123367",
+          "duration_ms": 285,
+          "timestamp": "2026-10-26T03:40:53.017387+00:00"
+        }
+      ],
+      "results": [
+        {
+          "contract_id": "note-persistence",
+          "title": "保存备注后刷新与重新查询均保持相同内容",
+          "verdict": "pass",
+          "assertions": [
+            {
+              "assertion_id": "readback_matches_after_save",
+              "source": {
+                "quote": "用户保存备注后，刷新页面和重新查询时，备注必须保持与保存时相同。",
+                "basis": "direct",
+                "explanation": "保存后页面回显应与保存输入一致。"
+              },
+              "evidence_ids": [
+                "a098456633494b78b9507ff33a655a18"
+              ],
+              "verdict": "pass",
+              "actual": "验真独立验收",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "readback_matches_after_reload",
+              "source": {
+                "quote": "用户保存备注后，刷新页面和重新查询时，备注必须保持与保存时相同。",
+                "basis": "direct",
+                "explanation": "刷新页面后页面回显仍应保持保存内容。"
+              },
+              "evidence_ids": [
+                "747eda3f2f4644d5ba37e1434bf2deb4"
+              ],
+              "verdict": "pass",
+              "actual": "验真独立验收",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "api_note_matches_after_reload",
+              "source": {
+                "quote": "允许使用本测试应用公开的 GET 接口独立查询，页面与接口均应保留相同输入。",
+                "basis": "direct",
+                "explanation": "刷新后通过公开 GET 接口查询应返回相同备注。"
+              },
+              "evidence_ids": [
+                "a76762978e064de89bd3143b40a915ad"
+              ],
+              "verdict": "pass",
+              "actual": "验真独立验收",
+              "expected": "验真独立验收",
+              "operator": "eq"
+            },
+            {
+              "assertion_id": "acknowledgement_visible",
+              "source": {
+                "quote": "等待页面出现“保存成功”",
+                "basis": "direct",
+                "explanation": ""
+              },
+              "evidence_ids": [
+                "88421a6ce91a4816b766f4e1e943ce24"
+              ],
+              "verdict": "pass",
+              "actual": "保存成功",
+              "expected": "保存成功",
+              "operator": "contains"
+            }
+          ],
+          "fingerprint": ""
+        }
+      ],
+      "repair_validation": {
+        "original_run": "da1fc5607ccc46f783186d130fbd7935",
+        "same_contract": true,
+        "all_regressions_pass": true,
+        "original_had_defect": true,
+        "mode": "external target / executor revalidation; no automatic source patch was applied",
+        "verified": true
+      },
+      "usage": {
+        "calls": [
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3489,
+              "completion_tokens": 89,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1720,
+            "call_record": "5b6aa8565d494545afa2fe10fcc42787.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3660,
+              "completion_tokens": 107,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1652,
+            "call_record": "4ebb8824f6074e9dbfe8f2d6925634a3.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 3827,
+              "completion_tokens": 90,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1643,
+            "call_record": "089f3d449334456f86421f01664822e5.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4248,
+              "completion_tokens": 147,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1258,
+            "call_record": "c0fd79dcf56443f48ce91a19cd42e9b0.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4503,
+              "completion_tokens": 139,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1703,
+            "call_record": "45bc568b8bfc4f1997aa2564e98f3c54.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4683,
+              "completion_tokens": 123,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1422,
+            "call_record": "3b3303770e0b4892978e079a6d2acc0d.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4796,
+              "completion_tokens": 121,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1400,
+            "call_record": "74f9c7f389834181b1c7e6a0dc1fe392.json"
+          },
+          {
+            "task": "exploration",
+            "provider": "jiuwenswarm",
+            "status": "completed",
+            "usage": {
+              "prompt_tokens": 4952,
+              "completion_tokens": 87,
+              "runtime_profile": "yanzhen-metered-json-planner/1"
+            },
+            "duration_ms": 1606,
+            "call_record": "85a70dd0650b4e55a5bb08529093648e.json"
+          }
+        ],
+        "prompt_tokens": 34158,
+        "completion_tokens": 903,
+        "usage_complete": true,
+        "estimated_cost_usd": null,
+        "cost_basis": "not configured",
+        "wall_time_ms": 22690
+      },
+      "archive_sha256": "44315e4420e33551baae01c60358d39a87c2c453d6cc7719644799c4e726cb33",
+      "artifact_hash_validation": {
+        "valid": true,
+        "run_id": "c4a53bf6dde449ad9609f1d40dbd8b90",
+        "files_checked": 13,
+        "errors": []
+      }
+    }
+  ],
+  "independent_replay": {
+    "status": "verified",
+    "original_planned_steps": 6,
+    "reduced_planned_steps": 6,
+    "confirmations": 2
+  },
+  "external_repair_validation": {
+    "original_run": "8d7609133989489198dbf693f8ec0ee6",
+    "same_contract": true,
+    "all_regressions_pass": true,
+    "original_had_defect": true,
+    "mode": "external target / executor revalidation; no automatic source patch was applied",
+    "verified": true
+  },
+  "development_failures": [
+    {
+      "source": ".artifacts/real-model-initial-blocked.json",
+      "reason": "Missing required navigation produced BLOCKED; planner feedback subsequently improved"
+    },
+    {
+      "source": ".artifacts/real-swarm-drift-blocked.json",
+      "reason": "Literal relative/absolute URL matching exhausted planning budget; authorized URL resolution subsequently fixed"
+    }
+  ],
+  "cost": {
+    "cap_cny": "5",
+    "request_reservations": 44,
+    "reserved_upper_cny": "3.140580",
+    "all_usage_price_upper_cny": "0.405452",
+    "price_basis": "DeepSeek peak text rates: input 2/output 8 CNY per million, checked 2026-10-26; reservations are not invoices"
+  }
+}

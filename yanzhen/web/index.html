@@ -36,9 +36,7 @@
       </div>
       <div class="nav-caption">工作空间</div>
       <nav class="main-nav">
-        <button class="nav-item showcase-nav" data-view="showcase">
-          <i data-icon="play"></i><span>演示剧场</span><em>LIVE</em>
-        </button>
+        <a class="nav-item" href="/static/verifyagent.html"><i data-icon="sparkles"></i><span>通用验收 Agent</span></a>
         <button class="nav-item active" data-view="overview">
           <i data-icon="layout"></i><span>项目概览</span>
         </button>
@@ -105,8 +103,6 @@
           <button class="global-search" id="open-search">
             <i data-icon="search"></i><span>搜索运行记录…</span
             ><kbd>Ctrl K</kbd></button
-          ><button class="button top-demo-link" data-view="showcase">
-            <i data-icon="play"></i>看一场真实验收</button
           ><span class="environment-pill"
             ><span class="status-dot"></span>本地环境</span
           ><button class="icon-button" id="open-help" aria-label="打开使用指南">
@@ -141,14 +137,7 @@
                 把需求变成标准，让执行留下证据。<br />从发现问题，到在新环境中再次复现。
               </p>
               <div class="hero-actions">
-                <button
-                  class="button primary hero-primary"
-                  data-view="showcase"
-                >
-                  开始一场真实演示 <i data-icon="arrow-right"></i></button
-                ><button class="hero-secondary" data-new-run>
-                  进入验收工作台 <i data-icon="external"></i>
-                </button>
+                <a class="button primary hero-primary" href="/static/verifyagent.html">开始项目验收 <i data-icon="arrow-right"></i></a>
               </div>
               <div class="hero-foot">
                 <span>两个已适配项目</span><b>·</b><span>独立环境执行</span
@@ -246,7 +235,7 @@
                     ><small>权限边界 · 状态流转 · 数据保存</small></span
                   ><span class="connected-count">5 项标准</span
                   ><i data-icon="arrow-right"></i></button
-                ><button data-view="showcase" class="connected-project">
+                ><button data-project-target="todomvc" class="connected-project">
                   <span class="project-letter mint">T</span
                   ><span
                     ><strong>TodoMVC</strong
@@ -296,132 +285,6 @@
             <i data-icon="info"></i>统计口径：最近 50
             次运行；受控场景结果不代表真实项目检出率。
           </div>
-        </section>
-        <section id="view-showcase" class="view" hidden>
-          <div class="page-heading demo-page-heading">
-            <div>
-              <div class="eyebrow">THE ACCEPTANCE THEATER</div>
-              <h1>看见问题，也证明问题。</h1>
-              <p>一场从需求到修复验证的真实验收，让结果自己说话。</p>
-            </div>
-            <button id="demo-fullscreen" class="button secondary">
-              <i data-icon="external"></i>专注演示
-            </button>
-          </div>
-          <div class="theater-layout">
-            <aside class="chapter-rail" aria-label="演示章节">
-              <div class="rail-caption">A STORY IN FIVE ACTS</div>
-              <button class="chapter current" data-chapter="0">
-                <span>01</span>
-                <div>
-                  <strong>定义正确</strong><small>一句需求，一份标准</small>
-                </div>
-                <b>↗</b>
-              </button>
-              <button class="chapter" data-chapter="1">
-                <span>02</span>
-                <div>
-                  <strong>真实执行</strong><small>让浏览器实际检查</small>
-                </div>
-                <b>↗</b>
-              </button>
-              <button class="chapter" data-chapter="2">
-                <span>03</span>
-                <div>
-                  <strong>证据对照</strong><small>成功提示之外的真相</small>
-                </div>
-                <b>↗</b>
-              </button>
-              <button class="chapter" data-chapter="3">
-                <span>04</span>
-                <div>
-                  <strong>精简复现</strong><small>每一步，都重新验证</small>
-                </div>
-                <b>↗</b>
-              </button>
-              <button class="chapter" data-chapter="4">
-                <span>05</span>
-                <div>
-                  <strong>验证修复</strong><small>同一标准，再验一次</small>
-                </div>
-                <b>↗</b>
-              </button>
-              <div class="rail-note">
-                <i data-icon="shield-check"></i
-                ><strong>真实执行，完整留痕</strong>
-                <p id="demo-model-note">
-                  浏览器执行连接本地引擎。<br />离线规则无需模型密钥。
-                </p>
-              </div>
-            </aside>
-            <div class="theater-main">
-              <div class="theater-stage" id="theater-stage">
-                <div class="stage-topline">
-                  <span
-                    ><span class="live-dot"></span> YANZHEN LIVE SESSION</span
-                  ><span id="demo-session-state">等待开始</span>
-                </div>
-                <div id="demo-scene"></div>
-              </div>
-              <div class="theater-controls">
-                <div class="demo-control-left">
-                  <button class="button primary" id="demo-start">
-                    <i data-icon="play"></i>开始真实演示</button
-                  ><span id="demo-elapsed">约 30 秒，完成一次验收闭环</span>
-                </div>
-                <div class="demo-control-right">
-                  <select
-                    id="demo-provider"
-                    class="demo-provider"
-                    aria-label="演示需求解析方式"
-                  >
-                    <option value="offline">离线规则</option>
-                    <option value="deepseek">DeepSeek API</option>
-                    <option value="qwen">Qwen API</option>
-                  </select>
-                  <label class="autoplay-control"
-                    ><input
-                      id="demo-autoplay"
-                      type="checkbox"
-                      checked
-                    />自动讲解</label
-                  ><button
-                    id="demo-back"
-                    class="icon-button"
-                    aria-label="上一章"
-                  >
-                    ←</button
-                  ><button
-                    id="demo-next"
-                    class="icon-button"
-                    aria-label="下一章"
-                  >
-                    →
-                  </button>
-                </div>
-              </div>
-              <div
-                id="demo-caption"
-                class="demo-caption"
-                aria-live="polite"
-              ></div>
-              <div class="demo-disclosure">
-                <i data-icon="info"></i
-                ><span
-                  >目标：固定版本
-                  TodoMVC。上游内存存储与本地持久化修复版对照；每次运行使用隔离数据。</span
-                >
-              </div>
-            </div>
-          </div>
-          <section class="demo-delivery" id="demo-delivery" hidden>
-            <div>
-              <div class="eyebrow">EVIDENCE, DELIVERED.</div>
-              <h2>从一次发现，到一份可交付的证据。</h2>
-              <p>查看完整报告、下载证据包，或把复现步骤交给开发者。</p>
-            </div>
-            <div id="demo-delivery-actions"></div>
-          </section>
         </section>
         <section id="view-workbench" class="view" hidden>
           <div class="page-heading">
@@ -864,7 +727,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
     <script src="/static/liquid-glass.js?v=liquid-20261025-3" defer></script>
     <script src="/static/innovation.js" defer></script>
-    <script src="/static/showcase.js?v=liquid-20261025-3" defer></script>
-    <script src="/static/app.js" defer></script>
+    <script src="/static/app.js?v=workspace-5" defer></script>
   </body>
 </html>

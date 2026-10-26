@@ -18,6 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest==9.1.1"]
+swarm = ["jiuwenswarm==0.2.3"]
 
 [project.scripts]
 yanzhen = "yanzhen.cli:main"
@@ -27,7 +28,7 @@ yanzhen-mcp = "yanzhen.mcp_server:main"
 include = ["yanzhen*"]
 
 [tool.setuptools.package-data]
-yanzhen = ["web/*.html", "web/*.css", "web/*.js", "web/*.svg", "web/todomvc/*"]
+yanzhen = ["web/*.html", "web/*.css", "web/*.js", "web/*.svg", "web/fonts/*", "web/todomvc/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -65,7 +65,6 @@ function activeView(name) {
   if (
     ![
       "overview",
-      "showcase",
       "workbench",
       "history",
       "evidence",
@@ -73,10 +72,6 @@ function activeView(name) {
     ].includes(name)
   )
     name = "overview";
-  if (name !== "showcase") {
-    document.body.classList.remove("focus-demo");
-    $("#demo-fullscreen").innerHTML = icon("external") + "专注演示";
-  }
   state.view = name;
   $$(".view").forEach((v) => (v.hidden = v.id !== "view-" + name));
   $$(".nav-item").forEach((b) =>
@@ -84,7 +79,6 @@ function activeView(name) {
   );
   $("#page-name").textContent = {
     overview: "项目概览",
-    showcase: "演示剧场",
     workbench: "验收工作台",
     history: "运行记录",
     evidence: "证据中心",
@@ -408,13 +402,11 @@ function renderModelAvailability() {
     const config = state.config.providers?.[provider] || {
       enabled: provider === "qwen" && state.config.model_enabled,
     };
-    for (const selector of ["#provider", "#demo-provider"]) {
-      const option = $(selector + ' option[value="' + provider + '"]');
-      option.disabled = !config.enabled;
-      option.textContent =
-        (provider === "deepseek" ? "DeepSeek" : "Qwen") +
-        (config.enabled ? " API" : " · 暂未启用");
-    }
+    const option = $('#provider option[value="' + provider + '"]');
+    option.disabled = !config.enabled;
+    option.textContent =
+      (provider === "deepseek" ? "DeepSeek" : "Qwen") +
+      (config.enabled ? " API" : " · 暂未启用");
   }
   $("#sidebar-model-note").textContent = state.config.model_enabled
     ? "模型接口已启用，可选择离线规则或已配置的模型。"
@@ -476,7 +468,6 @@ async function init() {
     );
     await refreshHistory();
     bindWorkspace();
-    initShowcase();
     configureTarget("reimbursement", false);
     $("#target").onchange = () => {
       configureTarget($("#target").value, true);

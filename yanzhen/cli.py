@@ -36,11 +36,24 @@ def main():
     run.add_argument("--origin", default="http://127.0.0.1:8765")
     verify = sub.add_parser("verify-evidence")
     verify.add_argument("path")
+    generic = sub.add_parser('verify-demo',help='Run the controlled generic-kernel demo; manual is explicitly not autonomous inference')
+    generic.add_argument('--origin',default='http://127.0.0.1:8767')
+    generic.add_argument('--target-origin',default='http://127.0.0.1:8771')
+    generic.add_argument('--case',choices=['authorization','persistence'],default='persistence')
+    generic.add_argument('--variant',choices=['healthy','auth_bug','persistence_bug','both','drift'],default='persistence_bug')
+    generic.add_argument('--provider',choices=['manual','deepseek','qwen','jiuwenswarm'],default='manual')
+    generic.add_argument('--approve-local-fixture-writes',action='store_true')
+    generic.add_argument('--allow-model',action='store_true')
     args = parser.parse_args()
     if args.command == "serve":
         import uvicorn
         os.environ["YZ_PORT"] = str(args.port)
         uvicorn.run("yanzhen.app:app", host="127.0.0.1", port=args.port, log_level="info")
+    elif args.command == 'verify-demo':
+        from .verifyagent.demo import run_demo
+        result=run_demo(args.origin,args.target_origin,args.case,args.variant,provider=args.provider,approve_fixture_writes=args.approve_local_fixture_writes,allow_model=args.allow_model)
+        print(json.dumps(result,ensure_ascii=False,indent=2))
+        if result['status']!='completed':sys.exit(1)
     elif args.command == "verify-evidence":
         from .exports import verify_evidence
         result = verify_evidence(args.path)

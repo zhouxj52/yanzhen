@@ -1,5 +1,7 @@
 # 上游依赖与复用范围
 
+工作台本地字体使用 [Noto Sans SC](https://github.com/google/fonts/tree/main/ofl/notosanssc)（SIL Open Font License 1.1），CSS 别名为 `Yanzhen Sans`。将完整可变字体从 TTF 转为 WOFF2，没有删减字形或修改字形设计，保留原内部名称。完整许可、上游 Git blob 标识及源文件/发布文件 SHA-256 随字体放在 `yanzhen/web/fonts/`。字体通过本机静态服务加载，不请求外部字体 CDN。
+
 本项目自主编写验收契约、检查、报告、演示系统和工作台，未整仓复制调研中的测试 Agent 产品。
 
 | 上游 | 用途 | 上游许可 |
@@ -16,7 +18,16 @@
 
 Qwen3-Coder、Qwen3-VL、UI-TARS 的权重均未打包；真实模型在使用者配置的推理服务运行。尚未引入 Midscene、browser-use、OpenHands SDK 或 TestZeus Hercules 代码。
 
-JiuwenSwarm 的 YAML 配置格式根据官方 jiuwenswarm 0.2.3 wheel 核对。该 wheel 仅下载至忽略的 .cache 作为调研资料，没有作为项目运行依赖分发，也没有复制其业务代码。MCP 适配为本项目自行实现。
+新增可选依赖 [JiuwenSwarm 0.2.3](https://github.com/openJiuwen-ai/jiuwenswarm)（Apache-2.0）。E2A 桥接使用其实际发布的 `E2AEnvelope` 和 `parse_agent_server_wire_chunk`，传输层由本项目编写。实际运行时使用官方 `JiuWenSwarm` facade、会话队列与历史，通过官方 `AgentAdapter` 协议接入本项目无原生工具的计量 JSON 规划适配器；固定版本的 `_ensure_adapter` 受保护扩展点需要随 SDK 升级复核。真实模型浏览器流程已运行，独立研究环境安装在忽略的 D 盘 `.cache/swarm-runtime`。未复制其业务源码，没有声明已完成跨角色多 Agent 协作。MCP 适配由本项目自行实现。
+
+## 独立开源应用评测
+
+2026-10-26 新增两个外部目标：
+
+- [Spring Petclinic](https://github.com/spring-projects/spring-petclinic/tree/500158f732419217507c7656904b8e6aa1bcc0d6)，固定提交 `500158f732419217507c7656904b8e6aa1bcc0d6`，Apache-2.0。仅在忽略的 D 盘缓存中克隆和构建，未打包到验真发布物；上游 LICENSE/NOTICE 保留。人工根据其控制器测试、模型约束和模板编写外部验收协议，没有把上游 JUnit 全套测试计为验真实测。
+- [OWASP Juice Shop](https://github.com/juice-shop/juice-shop/releases/tag/v20.3.0)，官方 `v20.3.0` Windows/Node24 发布包，MIT。发布包 SHA-256、固定版本、用例与使用范围集中在 `scripts/benchmark_upstream.py`。仅在忽略的 D 盘缓存中运行，未复制其业务实现；启动预加载脚本只限制环回监听。权限缺陷是上游有意保留的已知挑战，不是本项目原创漏洞发现。
+
+RealWorld、BrowserGym、WebArena、MiniWoB++ 本轮仅作调研，未复用源码或声明已运行。调研不能替代各仓库及具体分发物的实际许可审查。
 
 ## TodoMVC 目标应用
 

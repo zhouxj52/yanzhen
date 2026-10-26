@@ -1,4 +1,4 @@
-"""Real stdio MCP adapter; JiuwenSwarm owns the outer orchestration loop."""
+"""Real stdio MCP tools for legacy and bounded generic verification APIs."""
 from __future__ import annotations
 
 import os
@@ -67,6 +67,30 @@ async def replay_defects(run_id: str, contract_id: str | None = None) -> dict:
 def main():
     initialize()
     server.run(transport="stdio")
+
+
+@server.tool()
+async def register_verification_target(target: dict) -> dict:
+    """Register an operator-authorized test target; the server's exact-origin allowlist is enforced."""
+    return await api('POST','/api/verify/targets',target)
+
+
+@server.tool()
+async def draft_verification_contracts(request: dict) -> dict:
+    """Draft generic contracts using an explicit real provider or supplied/manual mode. Human freeze is in the UI."""
+    return await api('POST','/api/verify/analyze',request)
+
+
+@server.tool()
+async def run_verification(request: dict) -> dict:
+    """Run already human-frozen generic contracts. Writes pause for human UI approval; this tool cannot approve them."""
+    return await api('POST','/api/verify/runs',request)
+
+
+@server.tool()
+async def get_verification_report(run_id: str) -> dict:
+    """Read real generic plans, trace, evidence and deterministic verdicts; never fabricate progress."""
+    return await api('GET','/api/verify/runs/'+run_id)
 
 
 if __name__ == "__main__":

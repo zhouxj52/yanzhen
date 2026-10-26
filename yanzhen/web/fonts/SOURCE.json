@@ -1,0 +1,12 @@
+{
+  "family": "Noto Sans SC",
+  "css_family_alias": "Yanzhen Sans",
+  "license": "SIL Open Font License 1.1",
+  "source": "https://github.com/google/fonts/blob/main/ofl/notosanssc/NotoSansSC[wght].ttf",
+  "source_git_blob": "fb0637bafbcd804fe32152370a1225990745b4bc",
+  "source_sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+  "packaged_file": "yanzhen-sans-sc.woff2",
+  "packaged_sha256": "d0421bf23d39f6c4c968fd0afa999c73f778fc0ba3ca5e0a864a41ba8878e23b",
+  "processing": "Full variable font converted from TTF to WOFF2; no glyph subset or typeface design changes; original internal names retained.",
+  "fonttools_version": "4.67.0"
+}

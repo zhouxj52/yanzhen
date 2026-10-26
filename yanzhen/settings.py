@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ARTIFACTS = ROOT / ".artifacts"
+ARTIFACTS = Path(os.getenv("YZ_ARTIFACTS_DIR", str(ROOT / ".artifacts"))).resolve()
 
 
 def initialize() -> None:

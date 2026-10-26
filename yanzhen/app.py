@@ -24,16 +24,23 @@ from .store import freeze_bundle, list_runs, load_bundle, load_run, report_bytes
 
 def create_app() -> FastAPI:
     initialize()
+    from .verifyagent.service import VerifyService
+    from .verifyagent.api import router as verify_router
+    verify_service = VerifyService()
     manager = RunManager(f"http://127.0.0.1:{os.getenv('YZ_PORT', '8765')}")
 
     @asynccontextmanager
     async def lifespan(app):
         manager.recover()
+        verify_service.recover()
         yield
+        await verify_service.close()
         await manager.shutdown()
 
     app = FastAPI(title="验真 · 软件验收工作台", version=__version__, lifespan=lifespan)
     app.state.jobs = manager
+    app.state.verify_jobs = verify_service
+    app.include_router(verify_router(verify_service))
     app.include_router(demo_router)
     app.include_router(todo_router)
     app.mount("/static", StaticFiles(directory=ROOT / "yanzhen" / "web"), name="static")
@@ -77,7 +84,9 @@ def create_app() -> FastAPI:
     async def invalid(request, exc):
         from fastapi.responses import JSONResponse
         detail = "输入或模型输出不符合验收契约格式" if isinstance(exc, ValidationError) else str(exc)
-        return JSONResponse(status_code=422, content={"detail": detail})
+        payload={"detail":detail}
+        if isinstance(exc,ValidationError):payload['validation_errors']=exc.errors(include_input=False,include_context=False)
+        return JSONResponse(status_code=422, content=payload)
 
     @app.get("/")
     def index():
@@ -181,8 +190,12 @@ def create_app() -> FastAPI:
 
     @app.post("/api/runs/{identifier}/repair-review/{contract_id}")
     def repair_review(identifier: str, contract_id: str, request: dict = Body(...)):
-        _, contract = archived_contract(identifier,contract_id)
-        return review_execution_repair(contract,ExecutionPlan.model_validate(request.get("original",{})),ExecutionPlan.model_validate(request.get("candidate",{})),str(request.get("witnessed_action","")))
+        run, contract = archived_contract(identifier,contract_id)
+        result=next((r for r in run.results if r.contract_id==contract_id),None)
+        witness=next((e.data.get('business_action','') for e in (result.evidence if result else []) if e.kind=='observation' and e.data.get('executor') in {'reimbursement','todomvc'} and e.data.get('role')==contract.role and e.data.get('business_action')==contract.kind),'')
+        review=review_execution_repair(contract,ExecutionPlan.model_validate(request.get("original",{})),ExecutionPlan.model_validate(request.get("candidate",{})),witness)
+        review['scope']='归档执行器见证的受限计划审查；忽略调用方 witnessed_action，不自动应用候选'
+        return review
 
     @app.post("/api/runs/{identifier}/reproduce/{contract_id}")
     async def reproduce(identifier: str, contract_id: str):
