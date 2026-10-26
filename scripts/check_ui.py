@@ -20,7 +20,7 @@ async def main():
         await page.locator(".metric-card").first.wait_for()
         records = await (await page.request.get("http://127.0.0.1:8765/api/runs")).json()
         assert await page.locator('[data-overview-metric="history"]').inner_text() == str(len(records))
-        assert await page.locator("#recent-runs tr").count() == min(5, len(records))
+        assert await page.locator("#recent-runs tr").count() == (min(5, len(records)) if records else 1)
         await page.screenshot(path=str(ARTIFACTS / "ui-overview.png"), full_page=True, animations="disabled")
         await page.locator('[data-chart-filter="fail"]').click()
         assert await page.locator('[data-chart-filter="fail"]').get_attribute("aria-pressed") == "true"

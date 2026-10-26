@@ -24,7 +24,17 @@ def initialize() -> None:
                 os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
-def model_config() -> dict:
+def model_config(provider: str = "qwen") -> dict:
+    if provider == "deepseek":
+        return {
+            "enabled": os.getenv("YZ_ENABLE_MODEL", "0") == "1",
+            "base_url": os.getenv("YZ_DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/"),
+            "model": os.getenv("YZ_DEEPSEEK_MODEL", "deepseek-flash"),
+            "key": os.getenv("YZ_DEEPSEEK_API_KEY", "") or os.getenv("DEEPSEEK_API_KEY", ""),
+            "allow_no_key": False,
+        }
+    if provider != "qwen":
+        raise ValueError("不支持的模型提供方")
     return {
         "enabled": os.getenv("YZ_ENABLE_MODEL", "0") == "1",
         "base_url": os.getenv("YZ_LLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1").rstrip("/"),

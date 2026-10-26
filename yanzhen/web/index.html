@@ -3,27 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#6262df" />
+    <meta name="theme-color" content="#e7ece9" />
     <title>验真 Yanzhen · 软件验收工作空间</title>
-    <link rel="icon" type="image/svg+xml" href="/static/brand.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/static/brand.svg?v=liquid-20261025-3"
+    />
     <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/studio.css?v=liquid-20261025-3" />
+    <link rel="stylesheet" href="/static/glass.css?v=liquid-20261025-3" />
   </head>
   <body>
     <a class="skip-link" href="#main">跳到主要内容</a>
     <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
     <aside class="sidebar" id="sidebar" aria-label="主导航">
       <a class="brand" href="#overview"
-        ><img src="/static/brand.svg" width="32" height="32" alt="" /><strong
-          >验真<span>Yanzhen</span></strong
-        ><span class="brand-label">BETA</span></a
+        ><img
+          src="/static/brand.svg?v=liquid-20261025-3"
+          width="32"
+          height="32"
+          alt=""
+        /><strong>验真<span>Yanzhen</span></strong
+        ><span class="brand-label">LAB</span></a
       >
       <div class="workspace-switch">
         <div class="workspace-avatar">Y</div>
-        <div><strong>本地工作空间</strong><small>Local workspace</small></div>
+        <div>
+          <strong>本地工作空间</strong><small>QUALITY INTELLIGENCE</small>
+        </div>
         <span class="status-dot"></span>
       </div>
       <div class="nav-caption">工作空间</div>
       <nav class="main-nav">
+        <button class="nav-item showcase-nav" data-view="showcase">
+          <i data-icon="play"></i><span>演示剧场</span><em>LIVE</em>
+        </button>
         <button class="nav-item active" data-view="overview">
           <i data-icon="layout"></i><span>项目概览</span>
         </button>
@@ -51,7 +66,9 @@
         <div class="mode-card">
           <span class="mode-icon"><i data-icon="shield"></i></span
           ><strong>本地执行，证据可查</strong>
-          <p>模型调用已关闭。先把每一条<br />验收标准验证清楚。</p>
+          <p id="sidebar-model-note">
+            模型调用已关闭。先把每一条<br />验收标准验证清楚。
+          </p>
           <button id="mode-guide">
             了解验收流程 <i data-icon="arrow-right"></i>
           </button>
@@ -88,6 +105,8 @@
           <button class="global-search" id="open-search">
             <i data-icon="search"></i><span>搜索运行记录…</span
             ><kbd>Ctrl K</kbd></button
+          ><button class="button top-demo-link" data-view="showcase">
+            <i data-icon="play"></i>看一场真实验收</button
           ><span class="environment-pill"
             ><span class="status-dot"></span>本地环境</span
           ><button class="icon-button" id="open-help" aria-label="打开使用指南">
@@ -112,21 +131,77 @@
               </button>
             </div>
           </div>
-          <div class="project-banner">
-            <div class="project-symbol"><i data-icon="layers"></i></div>
-            <div class="project-banner-copy">
-              <div>
-                <h2>报销系统 + TodoMVC</h2>
-                <span class="tag neutral">内置演示项目</span>
+          <section class="workspace-hero">
+            <div class="hero-copy">
+              <div class="hero-kicker">
+                <span class="live-dot"></span> REQUIREMENTS → EVIDENCE
               </div>
+              <h2>每一个结论，<br />都有迹可循<span>。</span></h2>
               <p>
-                权限隔离、状态流转与数据保存 ·
-                使用独立测试环境，保留完整执行证据
+                把需求变成标准，让执行留下证据。<br />从发现问题，到在新环境中再次复现。
               </p>
+              <div class="hero-actions">
+                <button
+                  class="button primary hero-primary"
+                  data-view="showcase"
+                >
+                  开始一场真实演示 <i data-icon="arrow-right"></i></button
+                ><button class="hero-secondary" data-new-run>
+                  进入验收工作台 <i data-icon="external"></i>
+                </button>
+              </div>
+              <div class="hero-foot">
+                <span>两个已适配项目</span><b>·</b><span>独立环境执行</span
+                ><b>·</b><span>原始证据可查</span>
+              </div>
             </div>
-            <span class="tag success"
-              ><span class="status-dot"></span>执行器已就绪</span
+            <div
+              class="hero-visual"
+              aria-label="需求、执行与证据的产品流程示意"
             >
+              <div class="visual-coordinate">
+                YZ / ACCEPTANCE ENGINE <span>01—04</span>
+              </div>
+              <div class="visual-orbit orbit-one"></div>
+              <div class="visual-orbit orbit-two"></div>
+              <div class="visual-node visual-contract">
+                <span class="node-icon"><i data-icon="file-text"></i></span>
+                <div>
+                  <small>01 / DEFINE</small><strong>先锁定正确的标准</strong
+                  ><span>需求有来源 · 契约可审阅</span>
+                </div>
+                <b>✓</b>
+              </div>
+              <div class="visual-connector">
+                <span></span><i data-icon="chevron-right"></i>
+              </div>
+              <div class="visual-core">
+                <div class="core-inner">
+                  <img
+                    src="/static/brand.svg?v=liquid-20261025-3"
+                    width="37"
+                    height="37"
+                    alt=""
+                  /><span>YANZHEN</span><small>执行 · 验证 · 复现</small>
+                </div>
+                <span class="core-pulse"></span>
+              </div>
+              <div class="visual-node visual-proof">
+                <span class="node-icon"><i data-icon="shield-check"></i></span>
+                <div>
+                  <small>04 / REPRODUCE</small><strong>交付可复核的答案</strong
+                  ><span>原始证据 + 精简复现步骤</span>
+                </div>
+                <b>↗</b>
+              </div>
+              <div class="visual-signal">
+                <span class="live-dot"></span> REAL EXECUTION. TRACEABLE
+                RESULTS.
+              </div>
+            </div>
+          </section>
+          <div class="section-eyeline">
+            <span>工作空间脉搏</span><small>来自最近 50 次真实运行</small>
           </div>
           <div class="overview-metrics" id="overview-metrics"></div>
           <div class="overview-grid">
@@ -155,42 +230,30 @@
             <section class="card health-card">
               <div class="card-heading">
                 <div>
-                  <h2>报销系统检查覆盖</h2>
+                  <h2>已连接的验收项目</h2>
                   <p>当前项目支持的验收维度</p>
                 </div>
                 <i data-icon="shield" class="muted"></i>
               </div>
-              <div class="coverage-list">
-                <div>
-                  <span class="coverage-icon purple"
-                    ><i data-icon="users"></i
-                  ></span>
-                  <div>
-                    <strong>角色与资源权限</strong
-                    ><small>本人、他人、管理员访问边界</small>
-                  </div>
-                  <span class="coverage-count">3 项</span>
-                </div>
-                <div>
-                  <span class="coverage-icon blue"
-                    ><i data-icon="workflow"></i
-                  ></span>
-                  <div>
-                    <strong>业务状态流转</strong
-                    ><small>已审批记录的重复提交保护</small>
-                  </div>
-                  <span class="coverage-count">1 项</span>
-                </div>
-                <div>
-                  <span class="coverage-icon teal"
-                    ><i data-icon="database"></i
-                  ></span>
-                  <div>
-                    <strong>数据持久化</strong
-                    ><small>保存、刷新与查询一致性</small>
-                  </div>
-                  <span class="coverage-count">1 项</span>
-                </div>
+              <div class="connected-projects">
+                <button
+                  data-project-target="reimbursement"
+                  class="connected-project"
+                >
+                  <span class="project-letter">R</span
+                  ><span
+                    ><strong>团队报销系统</strong
+                    ><small>权限边界 · 状态流转 · 数据保存</small></span
+                  ><span class="connected-count">5 项标准</span
+                  ><i data-icon="arrow-right"></i></button
+                ><button data-view="showcase" class="connected-project">
+                  <span class="project-letter mint">T</span
+                  ><span
+                    ><strong>TodoMVC</strong
+                    ><small>新增 · 完成 · 刷新保留</small></span
+                  ><span class="connected-count">3 项标准</span
+                  ><i data-icon="arrow-right"></i>
+                </button>
               </div>
               <div class="coverage-note">
                 <i data-icon="lock"></i>
@@ -233,6 +296,132 @@
             <i data-icon="info"></i>统计口径：最近 50
             次运行；受控场景结果不代表真实项目检出率。
           </div>
+        </section>
+        <section id="view-showcase" class="view" hidden>
+          <div class="page-heading demo-page-heading">
+            <div>
+              <div class="eyebrow">THE ACCEPTANCE THEATER</div>
+              <h1>看见问题，也证明问题。</h1>
+              <p>一场从需求到修复验证的真实验收，让结果自己说话。</p>
+            </div>
+            <button id="demo-fullscreen" class="button secondary">
+              <i data-icon="external"></i>专注演示
+            </button>
+          </div>
+          <div class="theater-layout">
+            <aside class="chapter-rail" aria-label="演示章节">
+              <div class="rail-caption">A STORY IN FIVE ACTS</div>
+              <button class="chapter current" data-chapter="0">
+                <span>01</span>
+                <div>
+                  <strong>定义正确</strong><small>一句需求，一份标准</small>
+                </div>
+                <b>↗</b>
+              </button>
+              <button class="chapter" data-chapter="1">
+                <span>02</span>
+                <div>
+                  <strong>真实执行</strong><small>让浏览器实际检查</small>
+                </div>
+                <b>↗</b>
+              </button>
+              <button class="chapter" data-chapter="2">
+                <span>03</span>
+                <div>
+                  <strong>证据对照</strong><small>成功提示之外的真相</small>
+                </div>
+                <b>↗</b>
+              </button>
+              <button class="chapter" data-chapter="3">
+                <span>04</span>
+                <div>
+                  <strong>精简复现</strong><small>每一步，都重新验证</small>
+                </div>
+                <b>↗</b>
+              </button>
+              <button class="chapter" data-chapter="4">
+                <span>05</span>
+                <div>
+                  <strong>验证修复</strong><small>同一标准，再验一次</small>
+                </div>
+                <b>↗</b>
+              </button>
+              <div class="rail-note">
+                <i data-icon="shield-check"></i
+                ><strong>真实执行，完整留痕</strong>
+                <p id="demo-model-note">
+                  浏览器执行连接本地引擎。<br />离线规则无需模型密钥。
+                </p>
+              </div>
+            </aside>
+            <div class="theater-main">
+              <div class="theater-stage" id="theater-stage">
+                <div class="stage-topline">
+                  <span
+                    ><span class="live-dot"></span> YANZHEN LIVE SESSION</span
+                  ><span id="demo-session-state">等待开始</span>
+                </div>
+                <div id="demo-scene"></div>
+              </div>
+              <div class="theater-controls">
+                <div class="demo-control-left">
+                  <button class="button primary" id="demo-start">
+                    <i data-icon="play"></i>开始真实演示</button
+                  ><span id="demo-elapsed">约 30 秒，完成一次验收闭环</span>
+                </div>
+                <div class="demo-control-right">
+                  <select
+                    id="demo-provider"
+                    class="demo-provider"
+                    aria-label="演示需求解析方式"
+                  >
+                    <option value="offline">离线规则</option>
+                    <option value="deepseek">DeepSeek API</option>
+                    <option value="qwen">Qwen API</option>
+                  </select>
+                  <label class="autoplay-control"
+                    ><input
+                      id="demo-autoplay"
+                      type="checkbox"
+                      checked
+                    />自动讲解</label
+                  ><button
+                    id="demo-back"
+                    class="icon-button"
+                    aria-label="上一章"
+                  >
+                    ←</button
+                  ><button
+                    id="demo-next"
+                    class="icon-button"
+                    aria-label="下一章"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+              <div
+                id="demo-caption"
+                class="demo-caption"
+                aria-live="polite"
+              ></div>
+              <div class="demo-disclosure">
+                <i data-icon="info"></i
+                ><span
+                  >目标：固定版本
+                  TodoMVC。上游内存存储与本地持久化修复版对照；每次运行使用隔离数据。</span
+                >
+              </div>
+            </div>
+          </div>
+          <section class="demo-delivery" id="demo-delivery" hidden>
+            <div>
+              <div class="eyebrow">EVIDENCE, DELIVERED.</div>
+              <h2>从一次发现，到一份可交付的证据。</h2>
+              <p>查看完整报告、下载证据包，或把复现步骤交给开发者。</p>
+            </div>
+            <div id="demo-delivery-actions"></div>
+          </section>
         </section>
         <section id="view-workbench" class="view" hidden>
           <div class="page-heading">
@@ -304,6 +493,7 @@
                 ><select id="provider">
                   <option value="offline">离线规则解析</option>
                   <option value="qwen">Qwen 模型接口</option>
+                  <option value="deepseek">DeepSeek 模型接口</option>
                 </select>
                 <p class="field-help" id="provider-help">
                   基础框架阶段，无需配置模型即可完整运行。
@@ -611,7 +801,7 @@
                   </div>
                   <div>
                     <dt>模型调用</dt>
-                    <dd>默认关闭</dd>
+                    <dd id="guide-model-status">默认关闭</dd>
                   </div>
                   <div>
                     <dt>数据范围</dt>
@@ -620,7 +810,8 @@
                 </dl>
                 <p class="field-help">
                   当前版本适配报销系统与固定版本
-                  TodoMVC，尚未接入任意网站或大模型。
+                  TodoMVC；可选择离线规则或已配置的模型
+                  API，尚未支持任意网站接入。
                 </p>
               </section>
               <section class="card guide">
@@ -671,7 +862,9 @@
       </div>
     </dialog>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script src="/static/liquid-glass.js?v=liquid-20261025-3" defer></script>
     <script src="/static/innovation.js" defer></script>
+    <script src="/static/showcase.js?v=liquid-20261025-3" defer></script>
     <script src="/static/app.js" defer></script>
   </body>
 </html>

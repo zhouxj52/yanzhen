@@ -22,7 +22,7 @@ async def api(method: str, path: str, body: dict | None = None):
 
 @server.tool()
 async def analyze_requirements(requirements: str, provider: str = "offline", target: str = "reimbursement") -> dict:
-    """Draft contracts. offline is a limited demo parser; qwen calls configured real inference."""
+    """Draft contracts. offline uses rules; qwen/deepseek call explicitly enabled model services."""
     return await api("POST", "/api/analyze", {"requirements": requirements, "provider": provider, "target":target})
 
 

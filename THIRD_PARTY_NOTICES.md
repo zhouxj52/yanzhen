@@ -31,4 +31,8 @@ JiuwenSwarm 的 YAML 配置格式根据官方 jiuwenswarm 0.2.3 wheel 核对。�
 - [shadcn/ui](https://github.com/shadcn-ui/ui)（MIT）：参考官方 [Dashboard / Sidebar blocks](https://ui.shadcn.com/blocks) 的侧栏、面包屑和卡片组织方式。
 - [Ant Design](https://github.com/ant-design/ant-design)（MIT）：参考官方布局与数据展示规范，安排表格、筛选、状态和空页面反馈。
 
-当前前端使用项目自行编写的 HTML、CSS、JavaScript 与 SVG，没有复制上述仓库的组件源码、Logo 或整页模板，也没有安装其 React 组件包。上述项目作为设计参考列示，不能据此声称本项目使用了它们的组件实现。
+shadcn/ui 和 Ant Design 仅作设计参考，没有复制其组件源码、Logo 或整页模板，也没有安装其 React 组件包。
+
+- [rdev/liquid-glass-react](https://github.com/rdev/liquid-glass-react)（MIT，Copyright 2025 MAX ROVENSKY）：参考并改写独立背景光学层、SVG 位移滤镜与边缘高光的实现方式，适配为本项目无需 React 的 `yanzhen/web/liquid-glass.js` 和 `glass.css`。保留完整许可于 `third_party/liquid-glass-react/LICENSE`。圆角矩形的位移图、本地生命周期、响应式布局和 SVG 壁纸由本项目实现，没有使用上游的 base64 贴图、React 包或整页模板。
+- [React Bits / Glass Surface](https://reactbits.dev/components/glass-surface)：调研玻璃表面与折射效果，未复制其组件源码或安装其包。其当前许可为 MIT + Commons Clause，不能简写为纯 MIT。
+- [Apple / Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/)：参考导航层与内容层的层级、悬浮圆角控件及通透材质原则。本项目为网页近似实现，不包含 Apple 的原生材质或品牌素材。

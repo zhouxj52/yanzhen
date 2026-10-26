@@ -90,8 +90,14 @@ def create_app() -> FastAPI:
     @app.get("/api/config")
     def config():
         model = model_config()
+        providers = {}
+        for name, label in (("qwen","Qwen"),("deepseek","DeepSeek")):
+            item = model_config(name)
+            providers[name] = {"label":label,"model":item["model"],"enabled":item["enabled"],
+                               "configured":item["enabled"] and (bool(item["key"]) or item["allow_no_key"])}
         return {"default_requirements": DEFAULT_REQUIREMENTS, "catalog": CATALOG, "scenarios": SCENARIOS,
                 "model": model["model"], "model_enabled": model["enabled"], "model_configured": model["enabled"] and (bool(model["key"]) or model["allow_no_key"]),
+                "providers":providers,
                 "targets": {"reimbursement":{"label":"团队报销系统","requirements":DEFAULT_REQUIREMENTS,"scenarios":SCENARIOS}, "todomvc":{"label":"TodoMVC 官方开源任务管理示例","requirements":TODO_REQUIREMENTS,"scenarios":TODO_SCENARIOS}},
                 "scope": "适配内置报销系统与固定版本 TodoMVC；不代表支持任意网站。"}
 

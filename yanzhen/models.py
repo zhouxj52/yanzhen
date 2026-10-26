@@ -70,7 +70,7 @@ class Bundle(BaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
     requirements: str
-    provider: Literal["offline", "qwen"]
+    provider: Literal["offline", "qwen", "deepseek"]
     model: str | None = None
     contracts: list[Contract] = Field(min_length=1, max_length=30)
     created_at: str = Field(default_factory=now)
@@ -100,7 +100,7 @@ class Bundle(BaseModel):
 class AnalyzeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     requirements: str = Field(min_length=5, max_length=16000)
-    provider: Literal["offline", "qwen"] = "offline"
+    provider: Literal["offline", "qwen", "deepseek"] = "offline"
     target: Literal["reimbursement", "todomvc"] = "reimbursement"
 
 

@@ -32,7 +32,7 @@ def main():
     run.add_argument("--scenario", choices=["healthy", "broken", "auth_bug", "state_bug", "persistence_bug", "locator_drift", "environment_down", "upstream"])
     run.add_argument("--target", choices=["reimbursement","todomvc"],default="reimbursement")
     run.add_argument("--api-only", action="store_true")
-    run.add_argument("--provider", choices=["offline", "qwen"], default="offline")
+    run.add_argument("--provider", choices=["offline", "qwen", "deepseek"], default="offline")
     run.add_argument("--origin", default="http://127.0.0.1:8765")
     verify = sub.add_parser("verify-evidence")
     verify.add_argument("path")

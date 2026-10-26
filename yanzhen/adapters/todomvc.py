@@ -52,6 +52,12 @@ class TodoExecutor:
                 ok = completed == 1
                 evidence.append(Evidence(id="completed", kind="observation", description="已完成筛选中的真实 DOM", data={"count":completed}))
             elif contract.kind == "todo_persists":
+                try:
+                    before_file = contract.id + "-before.png"
+                    await page.screenshot(path=str(run_dir(self.run.id) / before_file), full_page=True)
+                    evidence.append(Evidence(id="before-screen",kind="screenshot",description="刷新前：任务已真实创建",file=before_file))
+                except Exception as exc:
+                    evidence.append(Evidence(id="before-capture-error",kind="observation",description="刷新前辅助截图失败",data={"error":type(exc).__name__}))
                 await page.reload()
                 await entry.wait_for()
                 retained = await page.locator(".todo-list li").filter(has_text=marker).count()

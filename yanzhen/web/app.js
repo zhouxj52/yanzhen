@@ -62,8 +62,21 @@ function toast(message, error = false) {
   );
 }
 function activeView(name) {
-  if (!["overview", "workbench", "history", "evidence", "guide"].includes(name))
+  if (
+    ![
+      "overview",
+      "showcase",
+      "workbench",
+      "history",
+      "evidence",
+      "guide",
+    ].includes(name)
+  )
     name = "overview";
+  if (name !== "showcase") {
+    document.body.classList.remove("focus-demo");
+    $("#demo-fullscreen").innerHTML = icon("external") + "专注演示";
+  }
   state.view = name;
   $$(".view").forEach((v) => (v.hidden = v.id !== "view-" + name));
   $$(".nav-item").forEach((b) =>
@@ -71,6 +84,7 @@ function activeView(name) {
   );
   $("#page-name").textContent = {
     overview: "项目概览",
+    showcase: "演示剧场",
     workbench: "验收工作台",
     history: "运行记录",
     evidence: "证据中心",
@@ -371,13 +385,43 @@ async function openRun(id) {
 }
 function providerChanged() {
   dirty();
-  const model = $("#provider").value === "qwen";
+  const provider = $("#provider").value;
+  const model = provider !== "offline";
+  const config = state.config.providers?.[provider] || {};
   $("#provider-help").textContent = model
-    ? state.config.model_configured
-      ? "调用已配置的模型：" + state.config.model
-      : "尚未配置模型接口。请在项目 .env 中填写凭据并重启。"
+    ? config.configured
+      ? "将通过服务端调用 " +
+        config.label +
+        " · " +
+        config.model +
+        "，只用于解析需求。"
+      : "请在项目本地 .env 配置 " +
+        (provider === "deepseek" ? "YZ_DEEPSEEK_API_KEY" : "YZ_LLM_API_KEY") +
+        "，启用模型并重启服务。"
     : "无需模型密钥。仅识别内置场景，不代表模型推理能力。";
-  $("#model-mode").textContent = model ? "真实模型接口" : "离线演示 · 固定规则";
+  $("#model-mode").textContent = model
+    ? (config.label || provider) + " API"
+    : "离线演示 · 固定规则";
+}
+function renderModelAvailability() {
+  for (const provider of ["qwen", "deepseek"]) {
+    const config = state.config.providers?.[provider] || {
+      enabled: provider === "qwen" && state.config.model_enabled,
+    };
+    for (const selector of ["#provider", "#demo-provider"]) {
+      const option = $(selector + ' option[value="' + provider + '"]');
+      option.disabled = !config.enabled;
+      option.textContent =
+        (provider === "deepseek" ? "DeepSeek" : "Qwen") +
+        (config.enabled ? " API" : " · 暂未启用");
+    }
+  }
+  $("#sidebar-model-note").textContent = state.config.model_enabled
+    ? "模型接口已启用，可选择离线规则或已配置的模型。"
+    : "模型调用已关闭，浏览器执行和证据校验正常可用。";
+  $("#guide-model-status").textContent = state.config.model_enabled
+    ? "接口已启用，按需选择"
+    : "默认关闭";
 }
 async function init() {
   try {
@@ -391,10 +435,7 @@ async function init() {
       )
       .join("");
     $("#scenario").value = "broken";
-    $('#provider option[value="qwen"]').disabled = !state.config.model_enabled;
-    if (!state.config.model_enabled)
-      $('#provider option[value="qwen"]').textContent =
-        "Qwen · 基础框架阶段暂未启用";
+    renderModelAvailability();
     $("#requirements").addEventListener("input", dirty);
     $("#provider").onchange = providerChanged;
     $("#load-example").onclick = () => {
@@ -435,6 +476,7 @@ async function init() {
     );
     await refreshHistory();
     bindWorkspace();
+    initShowcase();
     configureTarget("reimbursement", false);
     $("#target").onchange = () => {
       configureTarget($("#target").value, true);
@@ -703,9 +745,9 @@ function renderChart() {
       y +
       '" y2="' +
       y +
-      '" stroke="#edf0f6" stroke-dasharray="3 4"/><text x="16" y="' +
+      '" stroke="#e3e9f4" stroke-dasharray="3 4"/><text x="16" y="' +
       (y + 3) +
-      '" text-anchor="end" fill="#a1a9ba" font-size="9">' +
+      '" text-anchor="end" fill="#8795af" font-size="9">' +
       n +
       "</text>";
   }
@@ -731,10 +773,10 @@ function renderChart() {
       ) +
       "</title>";
     [
-      ["pass", "#7f80e7"],
-      ["fail", "#e9a0ae"],
-      ["blocked", "#e9d2a0"],
-      ["unclear", "#aeb4c4"],
+      ["pass", "#57a692"],
+      ["fail", "#d17c80"],
+      ["blocked", "#cfb274"],
+      ["unclear", "#a4afc5"],
     ].forEach(([key, color]) => {
       const h = ((r.summary?.[key] || 0) / max) * (bottom - top);
       y -= h;
@@ -763,7 +805,7 @@ function renderChart() {
       svg +=
         '<text x="' +
         (x + bw / 2) +
-        '" y="177" text-anchor="middle" fill="#a0a9bb" font-size="9">' +
+        '" y="177" text-anchor="middle" fill="#8d9db9" font-size="9">' +
         dateText(r.created_at, true) +
         "</text>";
     svg += "</g>";
@@ -1001,6 +1043,18 @@ async function refreshFeedback(message) {
   }
 }
 function bindWorkspace() {
+  $$("[data-project-target]").forEach(
+    (button) =>
+      (button.onclick = () => {
+        if (state.busy || working()) {
+          activeView("workbench");
+          toast("当前任务仍在执行，完成后可切换项目。");
+          return;
+        }
+        $("#target").value = button.dataset.projectTarget;
+        newDraft();
+      }),
+  );
   $$(".nav-item").forEach((b) => {
     b.title = b.textContent.trim();
     if (b.dataset.view) b.setAttribute("aria-label", b.textContent.trim());

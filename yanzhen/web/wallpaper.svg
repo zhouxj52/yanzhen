@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="180" y1="0" x2="1440" y2="1260" gradientUnits="userSpaceOnUse"><stop stop-color="#bccdd4"/><stop offset=".44" stop-color="#e1e6e4"/><stop offset="1" stop-color="#9bbcc0"/></linearGradient>
+    <linearGradient id="sea" x1="0" y1="430" x2="1420" y2="1340" gradientUnits="userSpaceOnUse"><stop stop-color="#456a75"/><stop offset=".42" stop-color="#6da3ac"/><stop offset=".76" stop-color="#b4d2cf"/><stop offset="1" stop-color="#9dafac"/></linearGradient>
+    <linearGradient id="light" x1="280" y1="320" x2="1190" y2="880" gradientUnits="userSpaceOnUse"><stop stop-color="#f2f1e8"/><stop offset=".5" stop-color="#f9f8f3"/><stop offset="1" stop-color="#b5cac9"/></linearGradient>
+    <linearGradient id="stone" x1="1310" y1="260" x2="1810" y2="920" gradientUnits="userSpaceOnUse"><stop stop-color="#d9c4b0"/><stop offset=".65" stop-color="#b9b8ac"/><stop offset="1" stop-color="#92b0b2"/></linearGradient>
+    <linearGradient id="edge" x1="200" y1="360" x2="1100" y2="1140" gradientUnits="userSpaceOnUse"><stop stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="32"/></filter>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1800v1200H0z"/>
+  <ellipse cx="1150" cy="190" rx="630" ry="300" fill="#faf9f4" opacity=".65" filter="url(#soft)"/>
+  <path d="M-150 400C180 170 397 370 486 619c98 272 395 457 803 208 256-156 470-95 661 25v480H-150Z" fill="url(#sea)"/>
+  <path d="M-140 320C190 180 292 411 369 595c117 281 360 334 604 127 234-199 392-554 781-396l126 211c-324-210-540 34-758 242-322 307-692 218-824-126C198 396 109 307-140 422Z" fill="url(#light)"/>
+  <path d="M1175-100c159 103 216 233 105 399-110 163-168 338-8 430 151 86 326 20 615 128V-100Z" fill="url(#stone)" opacity=".63"/>
+  <path d="M-140 320C190 180 292 411 369 595c117 281 360 334 604 127 234-199 392-554 781-396" stroke="url(#edge)" stroke-width="3"/>
+  <path d="M-200 1025c290-189 525-78 714 34 184 110 381 169 650 55 279-118 505-35 790 134" stroke="#e8f2ee" stroke-opacity=".2" stroke-width="110"/>
+</svg>
