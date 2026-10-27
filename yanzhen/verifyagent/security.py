@@ -4,6 +4,7 @@ from __future__ import annotations
 import ipaddress
 import os
 import re
+import socket
 from urllib.parse import urljoin, urlsplit, urlunsplit, unquote
 import posixpath
 
@@ -14,7 +15,7 @@ class PolicyError(ValueError):
     pass
 
 
-def origin(url: str) -> str:
+def origin(url: str, *, allow_public=False) -> str:
     p = urlsplit(url)
     if p.scheme not in {"http", "https"} or not p.hostname or p.username or p.password or p.fragment:
         raise PolicyError("Only credential-free HTTP(S) targets are allowed")
@@ -28,8 +29,10 @@ def origin(url: str) -> str:
     try:
         address = ipaddress.ip_address(host)
     except ValueError:
-        raise PolicyError("This release accepts literal test IPs or localhost, preventing DNS rebinding") from None
-    if address.is_link_local or address.is_multicast or address.is_unspecified or (not address.is_private and not address.is_loopback) or (address.is_reserved and not address.is_loopback):
+        if not allow_public or not re.fullmatch(r'(?=.{1,253}$)[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?', host) or '.' not in host or '..' in host:
+            raise PolicyError("A server-authorized HTTP(S) test hostname is required") from None
+        return f"{p.scheme}://{host}:{port}"
+    if address.is_link_local or address.is_multicast or address.is_unspecified or (not allow_public and not address.is_private and not address.is_loopback) or (address.is_reserved and not address.is_loopback):
         raise PolicyError("Public, metadata, multicast and reserved targets are blocked")
     netloc = f"[{host}]" if address.version == 6 else host
     return f"{p.scheme}://{netloc}:{port}"
@@ -40,12 +43,26 @@ class TargetPolicy:
         self.target = target
         if not target.authorized:
             raise PolicyError("Explicit local/test target authorization is required")
-        self.allowed = {origin(x.strip()) for x in (allowed if allowed is not None else os.getenv("YZ_VERIFY_ALLOWED_ORIGINS", "")).split(",") if x.strip()}
-        self.base_origin = origin(target.base_url)
+        from .projects import MANAGED_ORIGINS
+        self.allowed = {origin(x.strip(), allow_public=True) for x in (allowed if allowed is not None else os.getenv("YZ_VERIFY_ALLOWED_ORIGINS", "")).split(",") if x.strip()}
+        self.allowed |= {origin(x) for x in MANAGED_ORIGINS}
+        self.base_origin = origin(target.base_url, allow_public=True)
         base_path = urlsplit(target.base_url).path or "/"
         self.path_prefix = base_path if base_path.endswith("/") else posixpath.dirname(base_path) + "/"
         if self.base_origin not in self.allowed:
             raise PolicyError("Target origin is not in server-side YZ_VERIFY_ALLOWED_ORIGINS")
+        self.pinned_ip = None
+        host = urlsplit(self.base_origin).hostname
+        try:
+            ipaddress.ip_address(host)
+        except ValueError:
+            try:
+                addresses = sorted({row[4][0] for row in socket.getaddrinfo(host, urlsplit(self.base_origin).port, type=socket.SOCK_STREAM)}, key=lambda a: (ipaddress.ip_address(a).version, a))
+            except OSError:
+                raise PolicyError('Authorized hostname DNS resolution failed') from None
+            if not addresses or any(not ipaddress.ip_address(a).is_global for a in addresses):
+                raise PolicyError('Public hostname DNS must resolve only to global addresses; private/metadata rebinding is blocked')
+            self.pinned_ip = addresses[0]
         # The acceptance control plane is never a permissible target.
         if self.base_origin in {f"http://127.0.0.1:{os.getenv('YZ_PORT', '8765')}"}:
             raise PolicyError("The acceptance control plane cannot be the tested target")
@@ -56,7 +73,7 @@ class TargetPolicy:
         p = urlsplit(absolute)
         if p.scheme == "about" and absolute == "about:blank":
             return absolute
-        if origin(absolute) != self.base_origin:
+        if origin(absolute, allow_public=True) != self.base_origin:
             raise PolicyError("Cross-origin requests and redirects are blocked")
         if re.search(r"[\x00-\x20\\]", absolute):
             raise PolicyError("Ambiguous URL encoding")
@@ -69,7 +86,6 @@ class TargetPolicy:
         # Normalize localhost before connecting; no network DNS resolution is required.
         fixed = urlsplit(self.base_origin)
         return urlunsplit((p.scheme, fixed.netloc, p.path or "/", p.query, ""))
-
 
 def secret_headers(target: Target, actor: str) -> dict[str, str]:
     if actor == "anonymous":

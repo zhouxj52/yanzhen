@@ -12,6 +12,11 @@ def export(run: Run):
     directory = path("runs", run.id)
     payloads = {"contract.json":(directory / "contract.json").read_bytes()}
     payloads['target.json']=json.dumps(load_target(run.target_id).model_dump(mode='json'),ensure_ascii=False,indent=2).encode()
+    target = load_target(run.target_id)
+    if target.project_id:
+        from .projects import folder, load_project
+        payloads['project.json'] = json.dumps(load_project(target.project_id), ensure_ascii=False, indent=2).encode()
+        payloads['source-manifest.json'] = (folder(target.project_id) / 'manifest.json').read_bytes()
     for name, value in (("report.json",run.model_dump(mode="json")),("evidence-graph.json",run.graph),("trusted-trace.json",run.trace)):
         payloads[name] = json.dumps(value, ensure_ascii=False, indent=2).encode()
     for name in {e.artifact_reference for e in run.evidence if e.artifact_reference}:

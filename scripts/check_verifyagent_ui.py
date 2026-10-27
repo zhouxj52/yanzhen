@@ -36,7 +36,7 @@ async def main():
             assert not await page.locator('#va-workspace').is_visible()
             assert not await page.locator('#va-contract-editor').is_visible()
             assert not await page.locator('#va-result-panel').is_visible()
-            assert '不能上传源码并自动启动' in await page.locator('#va-welcome').inner_text()
+            assert 'GitHub' in await page.locator('#va-welcome').inner_text()
             await page.screenshot(path=str(OUTPUT/'verifyagent-start-desktop.png'),full_page=True,animations='disabled')
             await page.set_viewport_size({'width':390,'height':900})
             assert not await page.evaluate('document.documentElement.scrollWidth>innerWidth')

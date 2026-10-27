@@ -41,7 +41,7 @@ def main():
     generic.add_argument('--target-origin',default='http://127.0.0.1:8771')
     generic.add_argument('--case',choices=['authorization','persistence'],default='persistence')
     generic.add_argument('--variant',choices=['healthy','auth_bug','persistence_bug','both','drift'],default='persistence_bug')
-    generic.add_argument('--provider',choices=['manual','deepseek','qwen','jiuwenswarm'],default='manual')
+    generic.add_argument('--provider',choices=['manual','openjiuwen','deepseek','qwen','jiuwenswarm'],default='manual')
     generic.add_argument('--approve-local-fixture-writes',action='store_true')
     generic.add_argument('--allow-model',action='store_true')
     args = parser.parse_args()

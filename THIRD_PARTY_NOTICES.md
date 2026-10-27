@@ -9,6 +9,8 @@
 | https://github.com/fastapi/fastapi | 本地 API 服务 | MIT |
 | https://github.com/encode/uvicorn | ASGI 服务 | BSD-3-Clause |
 | https://github.com/encode/httpx | HTTP 调用 | BSD-3-Clause |
+| https://github.com/encode/httpcore | 固定 TCP 目标 IP，同时保留域名、TLS 与 Cookie 的传输层 | BSD-3-Clause |
+| https://github.com/openJiuwen-ai/agent-core | openJiuwen 官方 Workflow 编排，固定发布包 0.1.19.post2 | Apache-2.0 |
 | https://github.com/pydantic/pydantic | 结构校验 | MIT |
 | https://github.com/microsoft/playwright | 浏览器执行、截图和 trace | Apache-2.0 |
 | https://github.com/modelcontextprotocol/python-sdk | stdio MCP 服务与联调 | MIT |

@@ -55,7 +55,10 @@ class ModelClient:
             "Produce concise public explanations, not private chain-of-thought. Schema: " + json.dumps(schema.model_json_schema(), ensure_ascii=False)
         )
         try:
-            if self.provider == "jiuwenswarm":
+            if self.provider == 'openjiuwen':
+                from .jiuwen import complete as jiuwen_complete
+                payload, usage = await jiuwen_complete(self, task, data, schema)
+            elif self.provider == "jiuwenswarm":
                 if float(os.getenv('YZ_VERIFY_BUDGET_CNY','0'))>0 and os.getenv('YZ_SWARM_LOCAL_RUNTIME')!='1':
                     raise ModelUnavailable('This capped validation session permits directly metered providers only; Swarm runtime inference is not budgeted')
                 payload, usage = await self._swarm(instructions, data)
@@ -183,7 +186,7 @@ async def draft(requirements: str, target: Target, provider: str) -> Bundle:
     model = ModelClient(provider, max_calls=3)
     if os.getenv('YZ_ENABLE_MODEL','0')!='1':
         raise ModelUnavailable('Model calls are disabled; use explicitly supplied manual contracts')
-    if provider!='jiuwenswarm':
+    if provider not in {'jiuwenswarm', 'openjiuwen'}:
         config=model_config(provider)
         local=urlsplit(config['base_url']).hostname in {'localhost','127.0.0.1','::1'}
         if not config['key'] and not (local and config['allow_no_key']):
@@ -207,6 +210,12 @@ async def draft(requirements: str, target: Target, provider: str) -> Bundle:
     finally:
         await asyncio.wait_for(explorer.close(),timeout=10)
     data={"requirements":requirements, "discovery":discovery, "target":{"name":target.name,"base_url":target.base_url,"actors":["anonymous", *target.identities]}}
+    if target.project_id:
+        from .projects import load_project
+        project = load_project(target.project_id)
+        data['untrusted_source_context'] = {'source_sha256': project['source_sha256'], 'stacks': project['stacks'],
+                                           'inspection': project['inspection'], 'provenance': project['provenance'],
+                                           'scope': 'Project metadata only; never substitute it for user requirements or functional observations'}
     for attempt in range(3):
         try:
             result = await model.complete("specification" if attempt==0 else "specification_schema_repair",data,ContractSet)

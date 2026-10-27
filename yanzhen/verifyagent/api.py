@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, HTTPException, Request
 from fastapi.responses import FileResponse
 from pydantic import Field
 
@@ -24,6 +24,23 @@ class Approval(Strict):
     reviewer: str = "local-user"
 
 
+class ProjectInput(Strict):
+    kind: str = Field(pattern=r'^(github|directory)$')
+    location: str = Field(min_length=1, max_length=1500)
+    ref: str = Field(default='', max_length=200)
+    authorized: bool
+
+
+def local_operator(request: Request):
+    # Source intake reads server-side files. It is a local workstation operation.
+    from urllib.parse import urlsplit
+    if not request.client or request.client.host not in {'127.0.0.1', '::1', 'testclient'}:
+        raise HTTPException(403, '源码接入仅允许在验真服务器本机操作')
+    source = request.headers.get('origin')
+    if source and urlsplit(source).netloc != request.headers.get('host'):
+        raise HTTPException(403, '跨来源项目接入被拒绝')
+
+
 def router(service: VerifyService):
     routes = APIRouter(prefix="/api/verify", tags=["VerifyAgent"])
 
@@ -32,10 +49,67 @@ def router(service: VerifyService):
         from importlib.util import find_spec
         from ..settings import model_config
         import os
-        return {"contract_schema":Bundle.model_json_schema(),"action_schema":Action.model_json_schema(),"planner_modes":["manual","deepseek","qwen","jiuwenswarm"],
+        from .jiuwen import availability
+        return {"contract_schema":Bundle.model_json_schema(),"action_schema":Action.model_json_schema(),"planner_modes":["openjiuwen","manual","deepseek","qwen","jiuwenswarm"],
+                "default_planner":os.getenv('YZ_VERIFY_DEFAULT_PLANNER','openjiuwen'), 'openjiuwen':availability(),
+                'project_inputs':['url','github','zip','directory'],
                 "providers":{name:{"enabled":model_config(name)['enabled'],"configured":bool(model_config(name)['key']) or model_config(name)['allow_no_key']} for name in ('deepseek','qwen')},
                 "allowed_origins":[v.strip() for v in os.getenv('YZ_VERIFY_ALLOWED_ORIGINS','').split(',') if v.strip()],
-                "swarm_sdk_installed":find_spec("jiuwenswarm") is not None,"swarm_configured":os.getenv('YZ_ENABLE_MODEL')=='1' and bool(os.getenv('YZ_SWARM_WS_URL')) and os.getenv('YZ_SWARM_PLANNING_ONLY')=='1' and bool(os.getenv('YZ_SWARM_AGENT_ID')),"scope":"authorized literal-IP/localhost test environments; manual mode is not autonomous inference"}
+                "swarm_sdk_installed":find_spec("jiuwenswarm") is not None,"swarm_configured":os.getenv('YZ_ENABLE_MODEL')=='1' and bool(os.getenv('YZ_SWARM_WS_URL')) and os.getenv('YZ_SWARM_PLANNING_ONLY')=='1' and bool(os.getenv('YZ_SWARM_AGENT_ID')),"scope":"authorized local/private/public Web and API targets; source intake is not functional acceptance"}
+
+    @routes.post('/projects')
+    async def project(request: ProjectInput, context: Request):
+        import asyncio
+        from .projects import directory_files, github_files, save_project
+        local_operator(context)
+        if not request.authorized:
+            raise ValueError('请先确认有权提供和检查此项目源码')
+        if request.kind == 'github':
+            files, provenance = await github_files(request.location, request.ref)
+        else:
+            files = await asyncio.to_thread(directory_files, request.location)
+            provenance = {'source': 'authorized_server_directory_snapshot'}
+        return await asyncio.to_thread(save_project, files, request.kind, provenance)
+
+    @routes.post('/projects/upload')
+    async def upload(context: Request):
+        import asyncio
+        from .projects import archive_files, save_project, MAX_ARCHIVE
+        local_operator(context)
+        if context.headers.get('x-project-authorized') != '1':
+            raise ValueError('请先确认有权提供和检查此 ZIP')
+        data = bytearray()
+        async for chunk in context.stream():
+            data.extend(chunk)
+            if len(data) > MAX_ARCHIVE:
+                raise HTTPException(413, 'ZIP 不得超过 20 MB')
+        files = await asyncio.to_thread(archive_files, data)
+        import hashlib
+        return await asyncio.to_thread(save_project, files, 'zip', {'archive_sha256':hashlib.sha256(data).hexdigest()})
+
+    @routes.get('/projects/{identifier}')
+    def project_report(identifier: str):
+        from .projects import load_project
+        return load_project(identifier)
+
+    @routes.get('/projects/{identifier}/report')
+    def project_download(identifier: str):
+        from .projects import folder, load_project
+        load_project(identifier)
+        return FileResponse(folder(identifier)/'project.json', filename='source-inspection.json')
+
+    @routes.post('/projects/{identifier}/preview')
+    async def project_preview(identifier: str, context: Request):
+        import asyncio
+        local_operator(context)
+        return await asyncio.to_thread(service.previews.start, identifier)
+
+    @routes.post('/projects/{identifier}/preview/stop')
+    async def stop_preview(identifier: str, context: Request):
+        import asyncio
+        local_operator(context)
+        await asyncio.to_thread(service.previews.stop, identifier)
+        return {'state':'stopped'}
 
     @routes.get('/examples/{kind}')
     def example(kind: str):
@@ -49,6 +123,9 @@ def router(service: VerifyService):
 
     @routes.post("/targets")
     def target(request: Target):
+        if request.project_id:
+            from .projects import load_project
+            load_project(request.project_id)
         TargetPolicy(request)
         Redactor(request)  # Fail before registration if a test identity is unavailable.
         repo.save_target(request)
@@ -73,7 +150,7 @@ def router(service: VerifyService):
             bundle = Bundle(requirements=request.requirements,target_id=target.id,provider="manual",**request.supplied.model_dump())
             bundle.digest = bundle.calculate_digest()
         else:
-            if request.supplied or request.provider not in {"deepseek","qwen","jiuwenswarm"}:
+            if request.supplied or request.provider not in {"deepseek","qwen","jiuwenswarm","openjiuwen"}:
                 raise ValueError("Choose a real provider, or explicitly choose manual mode")
             bundle = await draft(request.requirements,target,request.provider)
         repo.save_bundle(bundle)

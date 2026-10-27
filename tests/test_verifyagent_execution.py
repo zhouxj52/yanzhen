@@ -78,7 +78,8 @@ def test_project_connection_check_uses_real_http_without_saving_contracts(monkey
         assert not (store.ARTIFACTS/'verifyagent'/'targets'/t.id/'target.json').exists()
         t.base_url='https://example.com/'
         unsupported=client.post('/api/verify/targets/check',json=t.model_dump(mode='json')).json()
-        assert not unsupported['ready'] and unsupported['state']=='unsupported_target'
+        # Public staging is supported now, but still needs explicit server authorization.
+        assert not unsupported['ready'] and unsupported['state']=='not_allowed'
         t.base_url='http://127.0.0.1:59999/'
         denied=client.post('/api/verify/targets/check',json=t.model_dump(mode='json')).json()
         assert not denied['ready'] and denied['state']=='not_allowed'

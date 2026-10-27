@@ -1,6 +1,6 @@
 # VerifyAgent 开发与验收记录
 
-日期：2026-10-26。本次为增量重构的纵向切片，真实模型及 Swarm 单规划角色已实跑，跨角色协作及竞赛对照实验未完成。
+更新日期：2026-10-27。本次为增量重构的纵向切片，真实模型及 Swarm 单规划角色已实跑，跨角色协作及竞赛对照实验未完成。
 
 ## 作品目标与三个创新
 
@@ -61,7 +61,7 @@ Schema 不依赖业务目录。动作覆盖 navigate、click、fill、select、w
 
 ## 安全与适用边界
 
-- 默认只接受服务端白名单中的精确来源、私网字面 IP 或 localhost，限制目标应用路径；跳转逐次校验，禁止外部 DNS 重绑定。
+- 接受服务端白名单中的精确本机、私网和公网测试来源，限制目标应用路径；公网域名必须全量解析到公共 IP，每次运行固定 TCP 连接地址，同时保留 Host、TLS SNI、证书验证和域名 Cookie。浏览器通过解析规则固定 IP；跨来源跳转仍拒绝。
 - 浏览器上下文、API 客户端按身份隔离；不接收任意脚本、eval、Shell，阻止下载、WebSocket 和越界请求。
 - click / fill / select 与非 GET/HEAD 请求需审批，审批绑定动作、运行、目标、契约及有效期；不得用调用方字符串伪造实际执行。
 - 身份只引用 `YZ_VERIFY_SECRET_*`；响应、轨迹、截图对已知凭据脱敏。
@@ -143,9 +143,9 @@ $env:YZ_ARTIFACTS_DIR='D:/openjiuwen/.artifacts/verifyagent-service'
 
 ## 自动化与小样本实验
 
-当前全量测试 **87 passed**（包含可选 SDK 协议测试及新增只读连接检查）；原有 55 项没有删除。最新 XML 位于 `.artifacts/onboarding-regression-tests.xml`，此前版本记录保留。最终 UI / MCP 状态集中在 `benchmarks/results/verification-summary.json`。
+当前全量测试 **101 passed**（包含可选 SDK 协议测试及新增只读连接检查）；原有 55 项没有删除。最新 XML 位于 `.artifacts/intake-final-tests.xml`，此前版本记录保留。最终 UI / MCP 状态集中在 `benchmarks/results/verification-summary.json`。
 
-首次使用入口改为“验收我的项目 / 先体验一个示例”，明确运行地址、需求、测试条件及 ZIP 暂不支持；清单以中文可读形式展示，高级 JSON 折叠。界面按阶段展示，不提前显示空执行或空结果。连接检查读取真实授权目标，不调用模型，也不生成验收结论。
+首次使用入口改为“验收我的项目 / 先体验一个示例”，支持 GitHub / ZIP / 本地目录与运行地址，明确区分源码预检和功能验收；清单以中文可读形式展示，高级 JSON 折叠。界面按阶段展示，不提前显示空执行或空结果。连接检查读取真实授权目标，不调用模型，也不生成验收结论。
 
 网页流程验证了版本保留、冻结、逐动作审批、实际 FAIL、矛盾图、真实精简、正常部署同标准 PASS、ZIP 全文件 SHA-256，以及 1480 / 900 / 390 宽度无横向溢出、页面错误为 0。该脚本调用模型为 0。
 
@@ -188,4 +188,17 @@ $env:YZ_ARTIFACTS_DIR='D:/openjiuwen/.artifacts/verifyagent-service'
 
 下一步优先用独立标注的需求和陌生目标运行 A / B / Full 与消融，报告分母与失败样本；扩展 Swarm 的规范生成 / 诊断角色协作并保持共用标准和费用边界。
 
-再扩展多契约精简、复杂登录、目标重置协议和自动代码修复。所有声明以实际执行结果为准。本地分支为 `codex/verifyagent-core`，尚未推送 GitHub。
+再扩展多契约精简、复杂登录、目标重置协议和自动代码修复。所有声明以实际执行结果为准。本次扩展与基础版本位于 `codex/verifyagent-ink-6` 分支。
+
+
+## 多来源接入与 openJiuwen 优先适配（2026-10-27）
+
+入口现在提供运行地址、公开 GitHub、ZIP、本地服务器目录四种材料。GitHub 分支解析为固定提交后下载；ZIP 校验路径、链接、重复及文件大小；目录受服务端允许根目录约束。内容复制为独立快照并保存文件 SHA-256，常见密钥文件、依赖和缓存排除。Python 只进行 AST 语法分析，不执行模块；配置与结构预检不输出业务验收 PASS。源码与部署来源的关联仍由用户声明，不是构建来源证明。
+
+纯静态 HTML 可以启动本地只读文件服务，关闭外部连接并继续真实浏览器验收。动态项目先预检，再按 README 启动依赖与服务，填写实际地址；没有自动安装或运行任意项目脚本。源码报告和文件清单加入验收 ZIP 的完整性清单。
+
+本地浏览器已实际验证：上传 ZIP → 源码快照 → 静态预览 → 人工样例契约冻结 → 实际填写 / 保存 / 刷新 → PASS → 导出并核对源码清单；另验证目录中的真实 Python 语法错误和公开 GitHub 固定提交导入。UI 宽度 1480 / 900 / 390 / 320 无横向溢出，页面错误为 0，模型调用为 0。记录 `.artifacts/intake-ui-check.json`；可通过 `scripts/check_project_intake_ui.py --with-github` 重现。
+
+竞赛首选入口是官方 `openjiuwen==0.1.19.post2` 的 Workflow / WorkflowComponent / create_workflow_session。每次需求分析和规划实际执行 request → model_planning → schema_validation → return，模型节点沿用本项目计量客户端与严格 Schema；工具、冻结标准、审批、重放和独立 Oracle 仍由验真负责。底层通过 `YZ_OPENJIUWEN_MODEL_PROVIDER` 选择 DeepSeek 或 Qwen，不把框架当作模型供应商，也未宣称完整多角色 Swarm。安装脚本默认安装 SDK，CI 配置也新增此集成测试；远端 CI 本次尚未运行。
+
+真实调用联调完成 1 次官方 Workflow → 已配置 DeepSeek 的规划请求，四节点都有完成记录，费用账本只增加 1 次，总计 57 次预留、保守上界 3.975344 元，未超过既有 5 元 / 60 次限额。记录 `.artifacts/openjiuwen-real-planning.json`。这是链路联调，不是端到端自主验收成功率。公开目标另用本项目 GitHub 公共 API 实际验证 HTTP / 浏览器读取成功与 IP 固定，记录 `.artifacts/public-project-connectivity.json`；静态预览和 TLS Cookie 测试不能代替复杂登录或跨域部署验收。

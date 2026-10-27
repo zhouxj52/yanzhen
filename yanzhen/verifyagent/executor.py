@@ -59,7 +59,10 @@ class ToolExecutor:
         if method not in {"GET", "HEAD"} and not self.allow_mutations:
             raise PolicyError("This write requires explicit action approval")
         if actor not in self.clients:
-            self.clients[actor] = httpx.AsyncClient(headers=self.headers(actor), timeout=10, trust_env=False, follow_redirects=False)
+            from urllib.parse import urlsplit
+            from .network import PinnedTransport
+            transport = PinnedTransport(urlsplit(self.policy.base_origin).hostname, self.policy.pinned_ip) if self.policy.pinned_ip else None
+            self.clients[actor] = httpx.AsyncClient(headers=self.headers(actor), transport=transport, timeout=10, trust_env=False, follow_redirects=False)
         for _ in range(5):
             self.network_budget -= 1
             if self.network_budget < 0:
@@ -94,7 +97,11 @@ class ToolExecutor:
                 self.driver = await async_playwright().start()
             except NotImplementedError as exc:
                 raise RuntimeError('Browser subprocess is unavailable on this event loop. On Windows start the service without --reload or multiple workers.') from exc
-            self.browser = await self.driver.chromium.launch(headless=True, args=["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"])
+            args = ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp", "--disable-quic", "--no-proxy-server"]
+            if self.policy.pinned_ip:
+                from urllib.parse import urlsplit
+                args.append(f'--host-resolver-rules=MAP {urlsplit(self.policy.base_origin).hostname} {self.policy.pinned_ip}')
+            self.browser = await self.driver.chromium.launch(headless=True, args=args)
         context = await self.browser.new_context(extra_http_headers=self.headers(actor), service_workers="block", accept_downloads=False, viewport={"width":1200,"height":800})
 
         async def gate(route):

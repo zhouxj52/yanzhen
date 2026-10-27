@@ -36,7 +36,7 @@ async def check_target(target: Target) -> dict:
         elif 'control plane' in reason:
             state, message = 'control_plane', '这里填写的是待验收项目的地址，请不要填写验真工作台自己的地址。'
         else:
-            state, message = 'unsupported_target', '当前只支持已授权的本机或内网 IP 测试地址，并要求页面和接口位于同一允许范围。公网域名和越界跳转暂不支持。'
+            state, message = 'unsupported_target', '请使用已授权的本机、内网或公网测试地址。公网域名必须解析到公共 IP；页面、接口与跳转须在同一授权范围内。'
         return {'ready': False, 'state': state, 'message': message, 'model_calls': 0}
     except (httpx.HTTPError, TimeoutError):
         return {'ready': False, 'state': 'unreachable', 'message': '暂时连接不上项目。请先启动项目，核对端口，并确认运行验真的这台电脑能打开它。', 'model_calls': 0}

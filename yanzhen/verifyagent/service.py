@@ -12,6 +12,8 @@ from .security import TargetPolicy
 
 class VerifyService:
     def __init__(self):
+        from .projects import ProjectPreviews
+        self.previews = ProjectPreviews()
         self.tasks = {}
         self.waiters = {}
         self.active = {}
@@ -114,3 +116,4 @@ class VerifyService:
             task.cancel()
         if jobs:
             await asyncio.wait(jobs,timeout=12)
+        await asyncio.to_thread(self.previews.close)

@@ -11,6 +11,7 @@ dependencies = [
   "fastapi==0.159.1",
   "uvicorn==0.54.0",
   "httpx==0.28.1",
+  "httpcore==1.0.9",
   "pydantic==2.14.1",
   "playwright==1.64.0",
   "mcp>=1.0,<2",
@@ -18,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest==9.1.1"]
+openjiuwen = ["openjiuwen==0.1.19.post2"]
 swarm = ["jiuwenswarm==0.2.3"]
 
 [project.scripts]

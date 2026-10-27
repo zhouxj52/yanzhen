@@ -23,6 +23,7 @@ export const verdictNames = {
   unclear: "需要澄清",
 };
 export const providerNames = {
+  openjiuwen: "openJiuwen · 官方工作流编排",
   manual: "预设 / 手动流程 · 不调用模型",
   deepseek: "DeepSeek · AI 规划",
   qwen: "Qwen · AI 规划",

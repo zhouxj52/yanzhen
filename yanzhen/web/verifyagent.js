@@ -9,7 +9,7 @@ import {
   resultView,
   traceView,
   logView,
-} from "./verifyagent-view.js?v=start-3";
+} from "./verifyagent-view.js?v=intake-7";
 
 const $ = (selector) => document.querySelector(selector);
 const state = {
@@ -26,6 +26,9 @@ const state = {
   checking: false,
   drafting: false,
   approvalSending: false,
+  project: null,
+  importing: false,
+  preview: null,
 };
 const terminal = (run) =>
   run && ["completed", "error", "cancelled"].includes(run.status);
@@ -128,7 +131,7 @@ function showStage(index, { scroll = true } = {}) {
   const texts = [
     [
       "先接入你的项目。",
-      "填写运行地址与验收要求，系统会先检查项目是否可访问。",
+      "导入 GitHub、ZIP、本地目录，或连接已运行的 Web / API 项目。",
     ],
     ["先确认，要检查哪些事。", "核对具体标准和补充条件，然后锁定这一版清单。"],
     [
@@ -155,6 +158,11 @@ function showStage(index, { scroll = true } = {}) {
 
 function defaultProvider() {
   const providers = state.config?.providers || {};
+  const preferred = state.config?.default_planner || "openjiuwen";
+  if (preferred === "manual") return "manual";
+  if (preferred === "openjiuwen" && state.config?.openjiuwen?.ready) return "openjiuwen";
+  if (providers[preferred]?.enabled && providers[preferred]?.configured) return preferred;
+  if (state.config?.openjiuwen?.ready) return "openjiuwen";
   return (
     ["deepseek", "qwen"].find(
       (name) => providers[name]?.enabled && providers[name]?.configured,
@@ -172,6 +180,7 @@ function clearConnection() {
 function prepareNew(mode = "own") {
   if (active())
     throw new Error("当前验收仍在执行，请先取消或等待结束，再新建项目。");
+  if (state.preview) api(`/projects/${state.preview.project_id}/preview/stop`, {}).catch(error);
   Object.assign(state, {
     target: null,
     bundle: null,
@@ -180,8 +189,12 @@ function prepareNew(mode = "own") {
     connection: null,
     connectionKey: null,
     targetSnapshot: null,
+    project: null,
+    preview: null,
   });
   $("#va-intake-form").reset();
+  updateSourceFields();
+  $("#va-source-report").hidden = true;
   $("#va-identities").value = "{}";
   $("#va-supplied").value = "";
   $("#va-actions").value = "";
@@ -210,6 +223,81 @@ function prepareNew(mode = "own") {
   controls();
 }
 
+function sourceKind() {
+  return document.querySelector('[name="project-source"]:checked')?.value || "url";
+}
+
+function updateSourceFields() {
+  const kind = sourceKind();
+  $("#va-source-fields").hidden = kind === "url";
+  for (const name of ["github", "zip", "directory"])
+    $(`#va-${name}-fields`).hidden = kind !== name;
+}
+
+function renderProject() {
+  const p = state.project;
+  const box = $("#va-source-report");
+  box.hidden = !p;
+  if (!p) return;
+  box.innerHTML = `<div class="va-source-report-heading"><strong>源码已接入 · ${esc(p.stacks.join(" / "))}</strong><a href="/api/verify/projects/${p.id}/report" download>下载预检报告</a></div>
+    <p>${p.files} 个文件 · ${(p.bytes / 1024).toFixed(0)} KB · ${esc(p.provenance.commit ? "提交 " + p.provenance.commit.slice(0, 12) : "已锁定源码快照")}</p>
+    <p>${esc(p.next_step)}</p>
+    <ul>${p.inspection.findings.map(f => `<li><strong>${f.level === "error" ? "发现预检问题" : "待完善"}</strong> ${esc(f.file)} ${esc(f.message)}</li>`).join("") || "<li>当前结构与语法预检未发现问题；功能是否满足要求，仍需实际验收。</li>"}</ul>
+    ${p.commands.length ? `<details><summary>项目声明的命令 · 尚未执行</summary>${p.commands.map(c => `<p>${esc(c.label)}：<code>${esc(c.command)}</code></p>`).join("")}</details>` : ""}
+    <p class="va-field-help">预检不是功能验收。源码哈希：<code>${esc(p.source_sha256.slice(0, 16))}…</code></p>
+    ${p.static_entry ? `<button id="va-preview-project" type="button" class="button secondary">${state.preview ? "停止静态预览" : "启动静态预览并填入地址"}</button>` : ""}`;
+  $("#va-preview-project")?.addEventListener("click", async (event) => {
+    event.target.disabled = true;
+    try {
+      if (state.preview) {
+        await api(`/projects/${p.id}/preview/stop`, {});
+        state.preview = null;
+        $("#va-url").value = "";
+      } else {
+        state.preview = await api(`/projects/${p.id}/preview`, {});
+        $("#va-url").value = state.preview.base_url;
+      }
+      clearConnection();
+      renderProject();
+      controls();
+    } catch (err) { error(err); event.target.disabled = false; }
+  });
+}
+
+bind("#va-import-project", async () => {
+  if (!$("#va-source-authorized").checked) throw new Error("请先确认源码检查授权。");
+  state.importing = true;
+  state.project = null;
+  $("#va-source-report").hidden = true;
+  controls();
+  try {
+    if (state.preview) {
+      await api(`/projects/${state.preview.project_id}/preview/stop`, {});
+      state.preview = null;
+      $("#va-url").value = "";
+    }
+    const kind = sourceKind();
+    if (kind === "zip") {
+      const file = $("#va-zip").files[0];
+      if (!file || !file.name.toLowerCase().endsWith(".zip")) throw new Error("请选择 ZIP 源码文件。");
+      if (file.size > 20 * 1024 * 1024) throw new Error("ZIP 不得超过 20 MB。");
+      const response = await fetch("/api/verify/projects/upload", {method: "POST", headers: {"Content-Type": "application/zip", "X-Project-Authorized": "1"}, body: file});
+      const result = await response.json();
+      if (!response.ok) throw new Error(typeof result.detail === "string" ? result.detail : "ZIP 导入失败，请核对文件。");
+      state.project = result;
+    } else {
+      state.project = await api("/projects", {kind, location: $(`#va-${kind}`).value.trim(), ref: kind === "github" ? $("#va-github-ref").value.trim() : "", authorized: true});
+    }
+    clearConnection();
+    renderProject();
+  } finally { state.importing = false; controls(); }
+});
+document.querySelectorAll('[name="project-source"]').forEach(input => input.addEventListener("change", () => {
+  updateSourceFields();
+  controls();
+}));
+$("#va-source-authorized").addEventListener("change", controls);
+
 function targetInput(url) {
   if (!$("#va-authorized").checked)
     throw new Error("请先勾选确认：你有权在这个测试项目中进行验收。");
@@ -222,7 +310,7 @@ function targetInput(url) {
   }
   if (!["http:", "https:"].includes(parsed.protocol))
     throw new Error(
-      "请填写 HTTP 或 HTTPS 的运行地址。ZIP 文件和 GitHub 源码链接目前不能直接导入。",
+      "请填写 HTTP 或 HTTPS 运行地址；源码请使用上方 GitHub、ZIP 或目录入口导入。",
     );
   if (parsed.origin === location.origin)
     throw new Error("请填写待验收项目的地址，不是验真工作台自己的地址。");
@@ -236,6 +324,7 @@ function targetInput(url) {
   return {
     name: state.mode === "example" ? "本地验收体验项目" : `项目 ${parsed.host}`,
     base_url: address,
+    project_id: url ? null : state.project?.id || null,
     interface: $("#va-interface").value,
     api_description_urls: $("#va-api-descriptions")
       .value.split(/\r?\n/)
@@ -278,7 +367,9 @@ async function checkConnection(payload = targetInput()) {
 }
 
 function controls() {
-  const busy = active() || state.drafting || state.checking;
+  const busy = active() || state.drafting || state.checking || state.importing;
+  $("#va-import-project").disabled = busy || !$("#va-source-authorized").checked;
+  $("#va-import-project").textContent = state.importing ? "正在建立源码快照…" : "导入并预检源码";
   const address = $("#va-url").value.trim(),
     requirements = $("#va-requirements").value.trim();
   const provider = $("#va-provider").value;
@@ -297,7 +388,7 @@ function controls() {
     : "下一步：生成检查清单 →";
   $("#va-check-target").textContent = state.checking ? "检查中…" : "检查连接";
   let help = !address
-    ? "先填写已经运行的项目地址。"
+    ? state.project ? state.project.next_step : "导入源码，或填写已经运行的项目地址。"
     : requirements.length < 5
       ? "再写下具体的功能与预期结果。"
       : !$("#va-authorized").checked
@@ -313,7 +404,9 @@ function controls() {
       ? state.mode === "example"
         ? "本次示例：预设清单与操作，不调用大模型，也不产生模型费用。"
         : "手动方式需要开发者提供完整清单与操作；普通项目建议使用已配置的 AI。"
-      : `将使用 ${providerNames[provider]} 整理清单，生成时会调用已配置的真实模型。`;
+      : provider === "openjiuwen"
+        ? `openJiuwen 官方工作流已就绪，底层模型：${state.config?.openjiuwen?.model_provider || "待配置"}。生成清单与逐步规划会产生实际模型调用。`
+        : `将使用 ${providerNames[provider]} 整理清单，生成时会调用已配置的真实模型。`;
   const frozen = state.bundle?.frozen;
   $("#va-freeze").disabled =
     busy ||
@@ -571,6 +664,8 @@ async function loadHistoryRun(id) {
   const run = await api("/runs/" + id);
   state.bundle = await api("/bundles/" + run.bundle_id);
   state.target = await api("/targets/" + run.target_id);
+  state.project = state.target.project_id ? await api("/projects/" + state.target.project_id) : null;
+  renderProject();
   state.mode = "history";
   $("#va-url").value = state.target.base_url;
   $("#va-interface").value = state.target.interface;
@@ -747,6 +842,8 @@ bind("#va-repair", async () => {
     },
   );
   state.target = candidate;
+  state.project = null;
+  renderProject();
   $("#va-url").value = candidate.base_url;
   state.targetSnapshot = JSON.stringify(targetInput());
   await follow(response.run.id);
@@ -820,6 +917,7 @@ try {
       !state.config.providers[name].configured;
   $("#va-provider option[value=jiuwenswarm]").disabled =
     !state.config.swarm_sdk_installed || !state.config.swarm_configured;
+  $("#va-provider option[value=openjiuwen]").disabled = !state.config.openjiuwen?.ready;
   if (state.mode !== "example") $("#va-provider").value = defaultProvider();
   $("#va-allowlist").textContent =
     "服务器当前允许：" +

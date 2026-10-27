@@ -1,3 +1,4 @@
+param([switch]$CoreOnly)
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $taskRoot
@@ -16,6 +17,10 @@ uv pip sync --python "$taskRoot\.venv\Scripts\python.exe" "$taskRoot\requirement
 if ($LASTEXITCODE -ne 0) { throw '依赖安装失败' }
 uv pip install --no-deps --python "$taskRoot\.venv\Scripts\python.exe" --editable "$taskRoot"
 if ($LASTEXITCODE -ne 0) { throw '项目安装失败' }
+if (-not $CoreOnly) {
+    uv pip install --python "$taskRoot\.venv\Scripts\python.exe" --editable "$taskRoot[openjiuwen]"
+    if ($LASTEXITCODE -ne 0) { throw 'openJiuwen 竞赛运行时安装失败；仅需要离线内核时可使用 -CoreOnly' }
+}
 & "$taskRoot\.venv\Scripts\python.exe" -m playwright install chromium
 if ($LASTEXITCODE -ne 0) { throw '浏览器安装失败；接口模式仍可通过 --api-only 使用' }
 Write-Host '安装完成。运行 .\scripts\start.ps1 打开 http://127.0.0.1:8765'

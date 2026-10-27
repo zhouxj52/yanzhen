@@ -170,7 +170,7 @@ class Bundle(ContractSet):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     requirements: str = Field(min_length=5, max_length=16000)
     target_id: str
-    provider: Literal["manual", "qwen", "deepseek", "jiuwenswarm"]
+    provider: Literal["manual", "qwen", "deepseek", "jiuwenswarm", "openjiuwen"]
     version: int = Field(default=1, ge=1)
     parent_id: str | None = None
     frozen: bool = False
@@ -209,6 +209,7 @@ class Target(Strict):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     name: str = Field(min_length=1, max_length=120)
     base_url: str
+    project_id: str | None = Field(default=None, pattern=r'^[a-f0-9]{32}$')
     interface: Literal["web", "api"] = "web"
     api_description_urls: list[str] = Field(default_factory=list,max_length=3)
     environment: Literal["local", "test"]
@@ -249,7 +250,7 @@ class Decision(Strict):
 
 class RunInput(Strict):
     bundle_id: str
-    planner: Literal["manual", "qwen", "deepseek", "jiuwenswarm"]
+    planner: Literal["manual", "qwen", "deepseek", "jiuwenswarm", "openjiuwen"]
     manual_actions: list[Action] = Field(default_factory=list, max_length=60)
     candidate_target_id: str | None = None
     parent_run: str | None = None

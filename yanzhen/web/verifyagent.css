@@ -1269,3 +1269,20 @@
     transition: none;
   }
 }
+/* Project material intake shares the workspace's high-contrast typography. */
+.va-source-picker { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.va-source-picker legend { font-weight: 650; margin-bottom: 10px; }
+.va-source-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.va-app .va-source-tabs label { position: relative; display: grid; grid-template-columns: 18px 1fr; gap: 4px 9px; align-items: center; margin: 0; padding: 14px 12px; border: 1px solid #b4c0cd; border-radius: 12px; background: #fff; cursor: pointer; }
+.va-app .va-source-tabs label:has(input:checked) { border: 2px solid #124d91; padding: 13px 11px; background: #edf3fb; }
+.va-app .va-source-tabs input { width: 16px; height: 16px; margin: 0; accent-color: #124d91; }
+.va-source-tabs span { grid-column: 2; color: #374151; font-size: 14px; }
+.va-source-fields { margin-bottom: 22px; padding: 18px; background: #f1f5fa; border: 1px solid #c4cfdb; border-radius: 14px; }
+.va-app .va-source-consent { display: flex; align-items: flex-start; gap: 9px; margin: 16px 0; }
+.va-app .va-source-consent input { width: 18px; height: 18px; margin: 4px 0 0; flex-shrink: 0; }
+.va-source-report { border: 1px solid #99b6d2; background: #f3f7fc; border-radius: 14px; padding: 18px; margin-bottom: 22px; overflow-wrap: anywhere; }
+.va-source-report-heading { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.va-source-report p, .va-source-report li { color: #252c35; line-height: 1.75; }
+.va-source-report ul { padding-left: 22px; }
+.va-source-report a { color: #124d91; text-decoration: underline; font-weight: 600; }
+@media (max-width: 450px) { .va-source-tabs { grid-template-columns: 1fr; } .va-source-fields, .va-source-report { padding: 14px; } }

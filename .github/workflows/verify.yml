@@ -10,7 +10,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install -e '.[test]'
+      # Execute the official openJiuwen Workflow integration as well as the kernel.
+      - run: python -m pip install -e '.[test,openjiuwen]'
       # Only official E2A schemas/codec are exercised in protocol unit tests.
       # This does not install or claim to run a full JiuwenSwarm agent server.
       - run: python -m pip install --no-deps jiuwenswarm==0.2.3 websockets==17.3
