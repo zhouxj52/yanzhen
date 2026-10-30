@@ -6,10 +6,10 @@
     <title>验真 · 开始项目验收</title>
     <link rel="icon" href="/static/brand.svg" />
     <link rel="preload" href="/static/fonts/yanzhen-sans-sc.woff2?v=1" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="/static/style.css" />
-    <link rel="stylesheet" href="/static/studio.css" />
-    <link rel="stylesheet" href="/static/glass.css" />
-    <link rel="stylesheet" href="/static/verifyagent.css?v=intake-7" />
+    <meta name="theme-color" content="#e8edf7" />
+    <meta name="description" content="提交项目，确认验收标准，用实际操作与可追溯证据核对软件交付。" />
+    <link rel="preload" href="/static/verifyagent-aurora.svg" as="image" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/verifyagent-atelier.css?v=clear-12" />
   </head>
   <body class="va-app">
     <aside class="sidebar" aria-label="主导航">
@@ -25,15 +25,13 @@
         </nav>
       </div>
       <div class="sidebar-bottom">
-        <p class="va-sidebar-note">先确认标准，再用证据验收。</p>
-        <div class="workspace-user"><span class="status-dot"></span><strong id="va-service">正在连接服务</strong></div>
+        <div class="va-sidebar-guide"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#shield"/></svg><strong>先确认标准，<br />再用证据验收。</strong><p>每一次检查，都保留依据。</p></div>
+        <div class="workspace-user" data-connection="pending"><span class="status-dot"></span><strong id="va-service">正在连接服务</strong></div>
       </div>
     </aside>
     <div class="app-shell">
       <header class="topbar">
-        <a href="/static/verifyagent.html" class="va-home-link"
-          >验真 / 项目验收</a
-        ><span id="va-mode" class="muted">准备一次新的验收</span>
+        <a href="/static/verifyagent.html" class="va-home-link"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#layers"/></svg><span class="va-mobile-brand">验真</span><span class="va-workspace-crumb">工作空间</span><span class="va-breadcrumb-separator">/</span><strong>项目验收</strong></a><span id="va-mode" class="va-mode-badge">准备一次新的验收</span>
       </header>
       <nav class="va-mobile-tabs" aria-label="快捷导航"><a class="active" href="/static/verifyagent.html" data-va-nav="start" aria-current="page">开始验收</a><a class="" href="/static/verifyagent.html?view=history" data-va-nav="history" id="va-mobile-history">验收记录</a></nav>
       <main>
@@ -43,62 +41,59 @@
           aria-labelledby="va-welcome-title"
         >
           <div class="va-welcome-copy">
-            <span class="va-eyebrow">让交付有据可查</span>
+            <span class="va-eyebrow va-hero-eyebrow"><span class="va-dot"></span>让每一项交付，有据可查</span>
             <h1 id="va-welcome-title">
-              软件有没有做到，<br />按你的要求验一遍。
+              交付是否达标，<br /><span>用证据作答。</span>
             </h1>
             <p class="va-lead">
-              导入项目源码，或连接已部署的项目。<br
-                class="va-desktop-break"
-              />写下验收要求，用实际操作、截图和复现步骤核对交付。
+              提交项目，写下你的验收要求。<br class="va-desktop-break" />确认标准，用实际操作与证据核对交付。
             </p>
             <div class="va-welcome-actions">
               <button id="va-own-project" class="button primary">
-                验收我的项目 <span aria-hidden="true">↗</span></button
+                验收我的项目 <svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#arrow"/></svg></button
               ><button id="va-try-demo" class="button secondary">
-                先体验一个示例
+                <svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#play"/></svg>先体验一个示例
               </button>
             </div>
             <p class="va-entry-scope">
-              <span class="va-dot"></span>GitHub · ZIP · 本地目录 · 运行地址<span
-                class="va-scope-divider"
-                >·</span
-              >openJiuwen 优先编排
+              <svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#layers"/></svg>openJiuwen 编排<span class="va-scope-divider">·</span>先确认清单，再开始执行
             </p>
             <p id="va-welcome-status" class="va-field-help" role="status"></p>
           </div>
           <aside class="va-preparation" aria-label="开始前需要准备什么">
-            <span class="va-small-label">你需要准备</span>
-            <ol>
+            <div class="va-preparation-top"><span><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#file-check"/></svg>一份有依据的验收</span><span class="va-preview-label">流程示意</span></div>
+            <div class="va-requirement-preview"><span class="va-small-label">从一句具体要求开始</span><p>“保存备注后，刷新页面，<br /><strong>原来的内容仍然存在。</strong>”</p><span class="va-preview-caption">把你的预期，变成可以核对的标准。</span></div>
+            <ol class="va-preview-flow">
               <li>
                 <span>01</span>
                 <div>
-                  <strong>源码，或者已运行的项目</strong>
-                  <p>支持公开 GitHub、ZIP、本地目录，以及本机 / 内网 / 公网测试地址。</p>
+                  <strong>接入项目，说明要求</strong>
+                  <p>公开 GitHub、ZIP、本地目录或运行地址。</p>
                 </div>
               </li>
               <li>
                 <span>02</span>
                 <div>
-                  <strong>你想验收的具体要求</strong>
-                  <p>例如：保存备注后，刷新页面内容仍然保留。</p>
+                  <strong>确认标准，实际检查</strong>
+                  <p>先审阅清单，涉及写入的操作逐步确认。</p>
                 </div>
               </li>
               <li>
                 <span>03</span>
                 <div>
-                  <strong>必要的测试条件</strong>
-                  <p>需要登录的项目，请准备测试身份和可使用的测试数据。</p>
+                  <strong>查看结论，追溯证据</strong>
+                  <p>对照实际观测，保留问题和未覆盖的要求。</p>
                 </div>
               </li>
             </ol>
-            <div class="va-source-note">
-              <strong>从你手上的材料开始</strong>
-              <p>
-                源码先做结构预检；静态网站可直接预览。需要构建或后端的项目，启动后继续功能验收。
-              </p>
-            </div>
+            <div class="va-source-note"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#shield"/></svg><p>需要登录的项目，请准备测试身份和可使用的数据。</p></div>
           </aside>
+          <div class="va-quick-start"><div class="va-quick-heading"><h2>从你手上的材料开始</h2><p>选择一种方式，进入项目验收。</p></div><div class="va-quick-options">
+            <button type="button" data-intake="github"><span class="va-quick-icon"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#github"/></svg></span><span><strong>GitHub 仓库</strong><small>导入公开源码</small></span><svg class="va-icon va-quick-arrow" aria-hidden="true"><use href="/static/verifyagent-icons.svg#diagonal"/></svg></button>
+            <button type="button" data-intake="zip"><span class="va-quick-icon"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#archive"/></svg></span><span><strong>ZIP 压缩包</strong><small>上传项目源码</small></span><svg class="va-icon va-quick-arrow" aria-hidden="true"><use href="/static/verifyagent-icons.svg#diagonal"/></svg></button>
+            <button type="button" data-intake="directory"><span class="va-quick-icon"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#folder"/></svg></span><span><strong>本地目录</strong><small>读取本机项目</small></span><svg class="va-icon va-quick-arrow" aria-hidden="true"><use href="/static/verifyagent-icons.svg#diagonal"/></svg></button>
+            <button type="button" data-intake="url"><span class="va-quick-icon"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#globe"/></svg></span><span><strong>运行地址</strong><small>连接 Web / API</small></span><svg class="va-icon va-quick-arrow" aria-hidden="true"><use href="/static/verifyagent-icons.svg#diagonal"/></svg></button>
+          </div><p class="va-quick-note">静态 HTML 可直接预览；需要后端或构建的项目，启动后继续功能验收。</p></div>
         </section>
 
         <section
@@ -117,13 +112,14 @@
             <button id="va-demo-close" class="text-button">收起</button>
           </div>
           <div class="va-demo-options">
+            <button id="va-challenge-example"><span class="va-demo-icon" aria-hidden="true"><svg class="va-icon"><use href="/static/verifyagent-icons.svg#shield"/></svg></span><strong>这套验收，能识破假保存吗？</strong><span>先验收正常源码 → 构造匿名反例 → 揭晓漏检与发现项</span><b>体验验收自检 →</b></button>
             <button data-example="persistence">
-              <span class="va-demo-icon" aria-hidden="true">↻</span
+              <span class="va-demo-icon" aria-hidden="true"><svg class="va-icon"><use href="/static/verifyagent-icons.svg#file-check"/></svg></span
               ><strong>保存后，数据真的还在吗？</strong
               ><span>实际填写 → 保存 → 刷新 → 独立查询</span
               ><b>体验保存检查 →</b></button
             ><button data-example="authorization">
-              <span class="va-demo-icon" aria-hidden="true">⌁</span
+              <span class="va-demo-icon" aria-hidden="true"><svg class="va-icon"><use href="/static/verifyagent-icons.svg#list"/></svg></span
               ><strong>用户能看到别人的订单吗？</strong
               ><span>使用两个测试身份，检查订单访问边界</span
               ><b>体验权限检查 →</b>
@@ -171,10 +167,10 @@
                 <fieldset class="va-source-picker">
                   <legend>选择项目材料</legend>
                   <div class="va-source-tabs">
-                    <label><input type="radio" name="project-source" value="url" checked /><strong>运行地址</strong><span>本机、内网或公网</span></label>
-                    <label><input type="radio" name="project-source" value="github" /><strong>GitHub</strong><span>公开仓库与指定版本</span></label>
-                    <label><input type="radio" name="project-source" value="zip" /><strong>ZIP 源码</strong><span>上传项目压缩包</span></label>
-                    <label><input type="radio" name="project-source" value="directory" /><strong>本地目录</strong><span>验真服务器上的文件夹</span></label>
+                    <label><input type="radio" name="project-source" value="url" checked /><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#globe"/></svg><strong>运行地址</strong><span>本机、内网或公网</span></label>
+                    <label><input type="radio" name="project-source" value="github" /><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#github"/></svg><strong>GitHub</strong><span>公开仓库与指定版本</span></label>
+                    <label><input type="radio" name="project-source" value="zip" /><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#archive"/></svg><strong>ZIP 源码</strong><span>上传项目压缩包</span></label>
+                    <label><input type="radio" name="project-source" value="directory" /><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#folder"/></svg><strong>本地目录</strong><span>验真服务器上的文件夹</span></label>
                   </div>
                 </fieldset>
                 <section id="va-source-fields" class="va-source-fields" hidden>
@@ -250,6 +246,7 @@
                   <label for="va-provider">验收方式</label
                   ><select id="va-provider">
                     <option value="openjiuwen">openJiuwen · 竞赛推荐编排</option>
+                    <option value="openjiuwen_team">openJiuwen · 多角色协作执行</option>
                     <option value="deepseek">
                       DeepSeek · AI 整理清单与规划
                     </option>
@@ -375,6 +372,7 @@
                 <p id="va-review-requirements"></p>
               </div>
               <div id="va-contract-summary"></div>
+              <details class="va-advanced"><summary>检查清单是否遗漏了需求？</summary><div id="va-coverage-preview" class="va-coverage"></div></details>
               <label class="va-check va-confirm-check"
                 ><input
                   id="va-confirm"
@@ -419,6 +417,7 @@
                 <p id="va-run-state" role="status" aria-live="polite">
                   清单已确认，点击开始执行。
                 </p>
+                <p id="va-ready-summary" class="va-target-summary"></p>
               </div>
               <div class="va-actions">
                 <button class="button secondary" id="va-show-review">
@@ -431,8 +430,8 @@
                 </button>
               </div>
             </div>
-            <div class="va-body">
-              <div id="va-ready-summary" class="va-notice"></div>
+            <details id="va-execution-details" class="va-execution-details" open><summary><span>执行过程与操作记录</span><span class="va-execution-toggle">展开 / 收起</span></summary><div class="va-body">
+              <div id="va-collaboration" class="va-collaboration" hidden></div>
               <div id="va-approval" class="va-approval" hidden>
                 <strong>这一步需要你的确认</strong>
                 <p id="va-approval-description"></p>
@@ -466,7 +465,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div></details>
           </section>
 
           <section id="va-result-panel" class="card va-card" hidden>
@@ -481,9 +480,31 @@
                 >下载报告与证据 ZIP</a
               >
             </div>
+            <div id="va-result-metrics" class="va-result-metrics" aria-label="实际验收统计"></div>
             <div class="va-body">
               <div id="va-results" class="va-results"></div>
+              <div id="va-coverage" class="va-coverage" aria-label="需求检查证据关联"></div>
               <div id="va-screenshots" class="va-screenshots"></div>
+              <details id="va-challenge-tools" class="va-advanced" hidden>
+                <summary>反例挑战：检查这套验收会不会漏检</summary>
+                <p>在独立 HTML/JavaScript 副本中构造变异，冻结标准保持不变。执行侧只接收匿名地址，结束后核对分配承诺并揭晓补丁。</p>
+                <button id="va-discover-challenges" type="button" class="button secondary">查找源码中的反例候选</button>
+                <div id="va-challenge-candidates" class="va-challenge-candidates"></div>
+                <button id="va-prepare-challenge" type="button" class="button secondary" hidden>准备所选反例计划</button>
+                <div id="va-challenge-plan" hidden></div>
+                <label for="va-challenge-mode">执行方式</label><select id="va-challenge-mode">
+                  <option value="trace">固定真实轨迹重放 · 不调用模型</option>
+                  <option value="team">openJiuwen 多角色 · 真实模型规划</option>
+                  <option value="compare">相同请求上限下对照 · 单角色与多角色各跑一次</option>
+                </select>
+                <p class="va-field-help">多角色包含需求分析、反例挑战、执行规划和确定性证据审查；前三个角色调用模型，最终裁决由冻结断言完成。对照模式每次运行各限 12 次模型请求、90 秒。</p>
+                <label class="va-source-consent"><input type="checkbox" id="va-challenge-consent" />我已审阅准确补丁，允许在隔离副本中构造这些变异并重复原动作。AI 新规划的写入仍逐步确认。</label>
+                <div class="va-actions"><button id="va-start-challenge" type="button" class="button primary" disabled>开始匿名反例挑战</button><button id="va-cancel-challenge" type="button" class="button secondary" disabled>取消挑战</button></div>
+                <div id="va-challenge-status" role="status" aria-live="polite"></div>
+                <div id="va-challenge-approval" class="va-approval" hidden><strong>匿名副本中的这一步需要确认</strong><p id="va-challenge-action"></p><button id="va-challenge-approve" type="button" class="button primary">批准这一步</button><button id="va-challenge-deny" type="button" class="button secondary">拒绝并停止挑战</button></div>
+                <div id="va-challenge-role-log" class="va-collaboration" hidden></div>
+                <div id="va-challenge-results"></div>
+              </details>
               <details class="va-advanced">
                 <summary>查看证据之间的支持与矛盾</summary>
                 <p id="va-graph-summary" class="va-hint"></p>
@@ -526,14 +547,14 @@
             </p>
             <button class="text-button" id="va-refresh">刷新记录</button>
           </div>
+          <label class="va-history-search"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#search"/></svg><input id="va-history-search" type="search" placeholder="搜索记录编号、验收方式或状态" autocomplete="off" aria-label="搜索验收记录" /></label><p id="va-history-count" class="va-field-help" aria-live="polite"></p>
           <div id="va-history" class="va-history"></div>
         </details>
         <footer class="app-footer">
-          验真 Yanzhen · 先确认标准，再用真实行为验收
+          <span>验真 <b>YANZHEN</b></span><span>先确认标准，再用真实行为验收。</span>
         </footer>
       </main>
     </div>
-    <script src="/static/liquid-glass.js" defer></script>
-    <script type="module" src="/static/verifyagent.js?v=intake-7"></script>
+    <script type="module" src="/static/verifyagent.js?v=atelier-10"></script>
   </body>
 </html>

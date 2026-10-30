@@ -24,6 +24,7 @@ export const verdictNames = {
 };
 export const providerNames = {
   openjiuwen: "openJiuwen · 官方工作流编排",
+  openjiuwen_team: "openJiuwen · 多角色协作执行",
   manual: "预设 / 手动流程 · 不调用模型",
   deepseek: "DeepSeek · AI 规划",
   qwen: "Qwen · AI 规划",
@@ -157,15 +158,40 @@ export function contractSummary(bundle) {
 }
 
 export function resultView(run) {
-  return (
-    run.results
-      .map(
-        (r) =>
-          `<article><details ${r.verdict === "fail" || r.verdict === "blocked" ? "open" : ""}><summary><span class="va-verdict ${esc(r.verdict)}">${esc(verdictNames[r.verdict])} · ${esc(r.verdict.toUpperCase())}</span>${esc(r.title)}</summary>${(r.assertions || []).map((a) => `<div class="va-assertion ${esc(a.verdict)}"><p><strong>${esc(verdictNames[a.verdict])}</strong>${a.source?.quote ? `：${esc(a.source.quote)}` : ""}</p>${"actual" in a ? `<p>实际观测：${esc(valueText(a.actual))}<br />应满足的比较：${esc({ eq: "等于", ne: "不等于", contains: "包含", not_contains: "不包含", gte: "不小于", lte: "不大于", in: "属于", not_in: "不属于" }[a.operator] || a.operator || "")} ${esc(valueText(a.expected))}</p>` : "<p>所需操作或观测尚未完成，不能判断为通过。</p>"}</div>`).join("")}${!r.assertions?.length ? `<p class="va-field-help">${esc(r.reason || "尚未得到完整观测，请查看执行记录。")}</p>` : ""}<details class="va-developer"><summary>查看完整结果数据</summary><pre>${esc(pretty(r))}</pre></details></details></article>`,
-      )
-      .join("") ||
-    '<p class="va-hint">还没有完成的检查项，不会提前显示为通过。</p>'
-  );
+  const checks = (run.coverage?.requirements || []).flatMap(r => r.checks);
+  const measurement = {dom_text:'页面内容核对',dom_visible:'页面可见状态',http_status:'接口状态核对',http_json:'独立读取的数据'};
+  const operators = {eq:'等于',ne:'不等于',contains:'包含',not_contains:'不包含',gte:'不小于',lte:'不大于',in:'属于',not_in:'不属于'};
+  return run.results.map(r => `<article><details ${['fail','blocked'].includes(r.verdict) ? 'open' : ''}><summary><span class="va-verdict ${esc(r.verdict)}">${esc(verdictNames[r.verdict])} · ${esc(r.verdict.toUpperCase())}</span>${esc(r.title)}</summary><div class="va-result-detail">${(r.assertions || []).map((a,index) => {
+    const linked = checks.find(c=>c.contract_id===r.contract_id && c.predicate_id===a.assertion_id);
+    const probe = linked?.probes.find(p=>p.id!==linked.right_probe) || linked?.probes[0];
+    const title = measurement[probe?.source_type] || (a.assertion_id.startsWith('required_') ? '必要业务操作' : `检查条件 ${index+1}`);
+    return `<section class="va-assertion ${esc(a.verdict)}"><div class="va-assertion-head"><strong>${String(index+1).padStart(2,'0')} · ${esc(title)}</strong><span class="va-verdict ${esc(a.verdict)}">${esc(verdictNames[a.verdict])}</span></div>${'actual' in a ? `<div class="va-comparison"><div><span>实际观测</span><p>${esc(valueText(a.actual))}</p></div><div><span>标准要求 · ${esc(operators[a.operator] || a.operator || '')}</span><p>${esc(valueText(a.expected))}</p></div></div>` : '<p class="va-field-help">所需操作或观测尚未完成，不能判断为通过。</p>'}${a.source?.quote ? `<details class="va-assertion-source"><summary>查看这项检查的需求出处</summary><p>${esc(a.source.quote)}</p></details>` : ''}</section>`;
+  }).join('')}${!r.assertions?.length ? `<p class="va-field-help">${esc(r.reason || '尚未得到完整观测，请查看执行记录。')}</p>` : ''}<details class="va-developer"><summary>查看完整结果数据</summary><pre>${esc(pretty(r))}</pre></details></div></details></article>`).join('') || '<p class="va-hint">还没有完成的检查项，不会提前显示为通过。</p>';
+}
+
+export function metricsView(run) {
+  const counts = Object.fromEntries(['pass','fail','blocked','unclear'].map(key=>[key,run.results.filter(r=>r.verdict===key).length]));
+  const gaps = run.coverage ? run.coverage.summary.uncovered + run.coverage.summary.partial : null;
+  return [['pass','通过检查',counts.pass,'组检查'],['fail','发现问题',counts.fail,'组检查'],['blocked','受阻 / 待澄清',counts.blocked+counts.unclear,'组检查'],['uncovered','待补充检查',gaps,'条需求片段']].map(([kind,label,value,unit])=>`<article class="${kind}"><span>${label}</span><strong>${value===null?'—':value}</strong><small>${value===null?'关联数据尚未取得':unit}</small></article>`).join('');
+}
+
+export function coverageView(coverage, preview = false) {
+  if (!coverage) return '<p class="va-hint">正在读取需求与检查的关联。</p>';
+  const s = coverage.summary;
+  const link = (artifact, label) => coverage.run_id && /^screen-[a-f0-9]{32}\.png$/.test(artifact || '')
+    ? `<a target="_blank" rel="noopener" href="/api/verify/runs/${encodeURIComponent(coverage.run_id)}/artifacts/${encodeURIComponent(artifact)}">${esc(label)} ↗</a>` : '';
+  const groups = {preconditions:'前置条件', postconditions:'结果检查', invariants:'全程约束'};
+  const comparison = {eq:'应等于',ne:'应不等于',contains:'应包含',not_contains:'应不包含',in:'应属于',not_in:'应不属于',gte:'应不小于',lte:'应不大于'};
+  const measurement = {dom_text:'页面内容',dom_visible:'页面可见状态',http_status:'接口状态',http_json:'接口重新读取'};
+  const card = (c) => `<details class="va-coverage-check"><summary><strong>${esc(c.title)} · ${esc(groups[c.group])}</strong> <span class="va-verdict ${esc(c.verdict)}">${esc(verdictNames[c.verdict] || '尚未执行')}</span>${c.ambiguous ? ' · 重复引用待澄清' : ''}</summary>
+    <div class="va-coverage-chain"><div><strong>1 · 冻结检查</strong><ul>${c.probes.map(p=>`<li>${esc(probeText(p))}</li>`).join('')}</ul><p>${esc(comparison[c.operator] || c.operator)} ${esc(c.right_probe ? probeText(c.probes.find(p=>p.id===c.right_probe)) : valueText(c.expected))}</p><details><summary>查看引用原文</summary><p>${esc(c.quote)}</p></details></div>
+    <div><strong>2 · 该检查所在流程的实际步骤</strong>${c.steps.length ? `<ol>${c.steps.map(t=>`<li>${esc(describeAction(t.action))}<span>${t.ok ? '实际完成' : '受阻或证据待核对'} ${link(t.artifact, '截图')}</span></li>`).join('')}</ol>` : '<p>尚未执行任何步骤。</p>'}${c.operation_gaps.length ? '<p>仍有冻结操作未被可信记录证明完成。</p>' : ''}</div>
+    <div><strong>3 · 断言直接使用的证据</strong>${c.evidence.length ? c.evidence.map(e=>`<div><p>${esc(measurement[e.source_type] || e.source_type)}的实际值：${esc(valueText(e.value))}</p><details class="va-coverage-proof"><summary>${e.ok ? '来源与完整性已核对' : '观测或完整性受阻'} · 查看依据</summary><p>对应观测：${esc(e.probe_id)}</p><p>证据 ID：<code>${esc(e.id)}</code></p>${link(e.artifact, '查看证据截图')}</details></div>`).join('') : '<p>尚未取得可用于该断言的证据。</p>'}</div></div></details>`;
+  return `<div class="va-coverage-heading"><div><h3>${preview ? '确认前，先看看有没有漏掉的要求' : '需求 → 检查 → 执行 → 证据'}</h3><p>逐条回到你的原始要求，查看检查依据与尚未覆盖的内容。</p></div>${!preview && coverage.run_id ? `<a class="text-button" href="/api/verify/runs/${encodeURIComponent(coverage.run_id)}/artifacts/requirement-coverage.json">下载关联数据</a>` : ''}</div>
+    <div class="va-coverage-stats">${[['需求片段',s.total],['已验证',s.verified],['发现问题',s.failed],['未覆盖',s.uncovered],['部分未关联',s.partial],['受阻',s.blocked],['待澄清',s.unclear],['未执行',s.not_run]].filter(([,n],i)=>i<4 || n>0).map(([label,n])=>`<span>${label}<b>${n}</b></span>`).join('')}</div>
+    <p class="va-coverage-note">按原文引用关联，方便追溯检查与漏项；不代表全部业务语义已验证。</p><details class="va-coverage-method"><summary>了解关联范围与判断方式</summary><p>${esc(coverage.note)}</p></details>${!coverage.integrity_ok ? '<p role="alert">冻结清单完整性核对失败，不能据此认定需求已验证。</p>' : ''}
+    <div class="va-coverage-filters" role="group" aria-label="筛选需求状态"><button type="button" data-coverage-filter="all" aria-pressed="true">全部</button><button type="button" data-coverage-filter="gaps" aria-pressed="false">未覆盖 / 部分未关联</button><button type="button" data-coverage-filter="problems" aria-pressed="false">问题 / 受阻 / 待澄清</button></div>
+    <div class="va-coverage-rows">${coverage.requirements.map(r=>`<details class="va-coverage-row" data-coverage-state="${esc(r.state)}" ${['failed','uncovered','partial','blocked','unclear'].includes(r.state) ? 'open' : ''}><summary><span class="va-coverage-state ${esc(r.state)}">${esc(r.label)}</span><strong>${esc(r.id.replace('req-', ''))}. ${esc(r.text)}</strong></summary><p>${esc(r.reason)}</p>${r.unlinked_text && ['partial','uncovered'].includes(r.state) ? `<p>尚未直接关联的文字：<mark>${esc(r.unlinked_text)}</mark></p>` : ''}${r.checks.length ? r.checks.map(card).join('') : '<p>请返回检查清单，补充可执行的结果检查后生成新版本。</p>'}</details>`).join('')}</div><p class="va-coverage-empty" hidden>这个筛选下没有需求片段。</p>`;
 }
 
 export function traceView(run, active) {

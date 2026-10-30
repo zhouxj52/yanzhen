@@ -1286,3 +1286,52 @@
 .va-source-report ul { padding-left: 22px; }
 .va-source-report a { color: #124d91; text-decoration: underline; font-weight: 600; }
 @media (max-width: 450px) { .va-source-tabs { grid-template-columns: 1fr; } .va-source-fields, .va-source-report { padding: 14px; } }
+.va-role-cards, .va-challenge-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0; }
+.va-role-cards article, .va-challenge-metrics article { border:1px solid #b2c5d8; border-radius:12px; padding:16px; background:#f3f7fc; min-width:0; }
+.va-role-cards article span { display:block; color:#374151; margin-top:6px; font-size:14px; }
+.va-role-cards p, .va-challenge-metrics p { color:#252c35; font-size:14px; line-height:1.75; margin:8px 0 0; }
+.va-collaboration { margin:16px 0 24px; }
+.va-collaboration pre, #va-challenge-plan pre, #va-challenge-results pre { max-height:360px; overflow:auto; }
+.va-app .va-mutation-choice { display:flex; align-items:flex-start; gap:12px; padding:14px; margin:12px 0; border:1px solid #b2c5d8; border-radius:12px; background:#fff; }
+.va-app .va-mutation-choice input { width:18px; height:18px; margin:4px 0 0; flex-shrink:0; }
+.va-mutation-choice>span { min-width:0; }
+.va-mutation-choice span span, .va-mutation-choice code { display:block; margin-top:6px; overflow-wrap:anywhere; white-space:normal; color:#252c35; font-size:14px; }
+.va-challenge-table { overflow:auto; margin:18px 0; }
+.va-challenge-table table { width:100%; border-collapse:collapse; }
+.va-challenge-table td, .va-challenge-table th { padding:12px; border-bottom:1px solid #bccbd9; text-align:left; font-size:14px; color:#252c35; }
+#va-challenge-status { margin:18px 0; font-weight:600; }
+#va-challenge-plan code { overflow-wrap:anywhere; }
+@media(max-width:600px) { .va-role-cards, .va-challenge-metrics { grid-template-columns:1fr; } }
+
+/* Requirement traceability stays in the existing review and results workspace. */
+.va-coverage { margin:24px 0; padding:22px; border:1px solid #adbed0; border-radius:16px; background:#f6f9fd; min-width:0; color:#172333; }
+.va-coverage-heading { display:flex; justify-content:space-between; gap:16px; align-items:start; flex-wrap:wrap; }
+.va-coverage h3 { margin:0 0 10px; font-size:20px; }
+.va-coverage p, .va-coverage li, .va-coverage summary, .va-coverage button, .va-coverage a { color:#1e2b3c; font-size:14px; line-height:1.8; overflow-wrap:anywhere; }
+.va-coverage-counts { font-weight:650; }
+.va-coverage-note { border-left:3px solid #2b5d92; padding-left:12px; }
+.va-coverage-filters { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.va-coverage-filters button { border:1px solid #9baec4; border-radius:8px; padding:7px 12px; background:white; cursor:pointer; font-weight:550; }
+.va-coverage-filters button[aria-pressed=true] { color:#fff; background:#1d4f84; border-color:#1d4f84; }
+.va-coverage-row { padding:16px; background:white; border:1px solid #b8c7d8; border-radius:12px; margin:12px 0; min-width:0; }
+.va-coverage-row>summary { cursor:pointer; }
+.va-coverage-row>summary>strong { font-size:16px; font-weight:600; }
+.va-coverage-state { display:inline-block; border:1px solid #99aabd; border-radius:6px; padding:2px 8px; margin:0 10px 6px 0; font-weight:650; background:#eef3f9; }
+.va-coverage-state.verified { background:#e9f5ee; color:#164e32; border-color:#83ae94; }
+.va-coverage-state.failed { background:#fff0ee; color:#8b251d; border-color:#d7a29d; }
+.va-coverage-state.uncovered, .va-coverage-state.partial, .va-coverage-state.blocked { background:#fff7e7; color:#65420b; border-color:#c8b181; }
+.va-coverage-check { margin-top:16px; border-top:1px solid #b7c8d9; padding-top:16px; }
+.va-coverage-check h4 { margin:0; font-size:16px; color:#172333; }
+.va-coverage-chain { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.va-coverage-chain>div { min-width:0; padding:14px; border-radius:10px; background:#f0f5fb; border:1px solid #c4d0dd; }
+.va-coverage-chain strong { font-size:14px; color:#18344f; }
+.va-coverage-chain ul, .va-coverage-chain ol { padding-left:20px; }
+.va-coverage-chain li { margin-bottom:9px; }
+.va-coverage-chain li>span { display:block; }
+.va-coverage a { color:#124c85; text-decoration:underline; }
+.va-coverage code { color:#1e2b3c; white-space:normal; overflow-wrap:anywhere; font-size:14px; }
+.va-coverage mark { background:#fff0c7; color:#533805; }
+.va-coverage-proof { margin:10px 0; }
+.va-coverage-row[hidden], .va-coverage-empty[hidden] { display:none!important; }
+@media(max-width:1050px) { .va-coverage-chain { grid-template-columns:1fr; } }
+@media(max-width:600px) { .va-coverage { padding:14px; } .va-coverage-row { padding:12px; } }

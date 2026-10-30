@@ -4,7 +4,7 @@ import hashlib
 import json
 import zipfile
 
-from .schema import Run
+from .schema import Run, Bundle
 from .repository import path, load_target
 
 
@@ -13,6 +13,9 @@ def export(run: Run):
     payloads = {"contract.json":(directory / "contract.json").read_bytes()}
     payloads['target.json']=json.dumps(load_target(run.target_id).model_dump(mode='json'),ensure_ascii=False,indent=2).encode()
     target = load_target(run.target_id)
+    from .coverage import build_coverage
+    coverage = build_coverage(Bundle.model_validate_json(payloads['contract.json']), run, target)
+    payloads['requirement-coverage.json'] = json.dumps(coverage, ensure_ascii=False, indent=2).encode()
     if target.project_id:
         from .projects import folder, load_project
         payloads['project.json'] = json.dumps(load_project(target.project_id), ensure_ascii=False, indent=2).encode()
@@ -36,3 +39,4 @@ def export(run: Run):
             archive.writestr(name,data)
     temporary.replace(directory / "evidence.zip")
     (directory / "manifest.json").write_bytes(payloads["manifest.json"])
+    (directory / 'requirement-coverage.json').write_bytes(payloads['requirement-coverage.json'])

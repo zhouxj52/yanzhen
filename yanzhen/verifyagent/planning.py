@@ -27,11 +27,31 @@ class ModelClient:
         self.session_id = "yanzhen-" + uuid.uuid4().hex
         self.last_candidate = None
 
+    def actual_call_count(self):
+        return sum(len(c['underlying_calls']) if 'underlying_calls' in c else 1 for c in self.calls)
+
+    def dispatched_call_count(self):
+        def count(entry):
+            if 'underlying_calls' in entry: return sum(count(c) for c in entry['underlying_calls'])
+            if entry.get('underlying_call'): return count(entry['underlying_call'])
+            return int(entry.get('request_sent', False))
+        return sum(count(entry) for entry in self.calls)
+
+    def provider_calls(self):
+        def leaves(entry):
+            if 'underlying_calls' in entry:
+                for child in entry['underlying_calls']: yield from leaves(child)
+            elif entry.get('underlying_call'):
+                yield from leaves(entry['underlying_call'])
+            else:
+                yield entry
+        return [leaf for entry in self.calls for leaf in leaves(entry)]
+
     async def complete(self, task: str, data: dict, schema):
-        if len(self.calls) >= self.max_calls:
+        if self.actual_call_count() >= self.max_calls:
             raise ModelUnavailable("Model call budget exhausted")
         started = time.monotonic()
-        entry = {"task":task, "provider":self.provider, "status":"started"}
+        entry = {"task":task, "provider":self.provider, "status":"started",'request_sent':False}
         reservation = None
         candidate = None
         call_id=uuid.uuid4().hex
@@ -55,7 +75,10 @@ class ModelClient:
             "Produce concise public explanations, not private chain-of-thought. Schema: " + json.dumps(schema.model_json_schema(), ensure_ascii=False)
         )
         try:
-            if self.provider == 'openjiuwen':
+            if self.provider == 'openjiuwen_team':
+                from .team import complete as team_complete
+                payload, usage = await team_complete(self, task, data, schema)
+            elif self.provider == 'openjiuwen':
                 from .jiuwen import complete as jiuwen_complete
                 payload, usage = await jiuwen_complete(self, task, data, schema)
             elif self.provider == "jiuwenswarm":
@@ -79,6 +102,7 @@ class ModelClient:
                 owned = self.client is None
                 client = self.client or httpx.AsyncClient(timeout=75, trust_env=False)
                 try:
+                    entry['request_sent']=True
                     response = await client.post(config["base_url"] + "/chat/completions", headers={"Authorization":"Bearer " + config["key"]} if config["key"] else {}, json=body)
                     if response.status_code >= 400:
                         raise ModelUnavailable(f"Model endpoint returned HTTP {response.status_code}")
@@ -147,6 +171,7 @@ class ModelClient:
                         raise ModelUnavailable('The bounded local Swarm runtime must share this cost ledger and expose no native tools')
                 request = E2AEnvelope(request_id=uuid.uuid4().hex, session_id=self.session_id, channel="web", method="chat.send", is_stream=True,agent_ref={'mode':'agent','id':os.environ['YZ_SWARM_AGENT_ID']},
                                       params={"query":instructions + "\nInput data:\n" + json.dumps(data,ensure_ascii=False), "mode":"agent.plan", "project_dir":str(ROOT / ".artifacts" / "swarm-workspace")})
+                self.calls[-1]['request_sent']=True
                 await socket.send(json.dumps(request.to_dict(),ensure_ascii=False))
                 text,usage = "",{}
                 async for raw in socket:
@@ -171,11 +196,13 @@ class ModelClient:
                 return json.loads(text),usage
 
     def usage(self):
-        prompt = sum(c.get("usage", {}).get("prompt_tokens", 0) for c in self.calls)
-        completion = sum(c.get("usage", {}).get("completion_tokens", 0) for c in self.calls)
+        providers = self.provider_calls()
+        prompt = sum(c.get("usage", {}).get("prompt_tokens", 0) for c in providers)
+        completion = sum(c.get("usage", {}).get("completion_tokens", 0) for c in providers)
         rates = (os.getenv("YZ_VERIFY_INPUT_USD_PER_MILLION"), os.getenv("YZ_VERIFY_OUTPUT_USD_PER_MILLION"))
         return {"calls":self.calls, "prompt_tokens":prompt, "completion_tokens":completion,
-                "usage_complete":all("usage" in c and c["usage"] for c in self.calls),
+                'actual_model_requests':self.dispatched_call_count(),'model_attempts':self.actual_call_count(),'planning_rounds':len(self.calls),
+                "usage_complete":all("usage" in c and c["usage"] for c in providers),
                 "estimated_cost_usd":(prompt*float(rates[0])+completion*float(rates[1]))/1_000_000 if all(rates) else None,
                 "cost_basis":"user-configured rates; not a provider invoice" if all(rates) else "not configured"}
 

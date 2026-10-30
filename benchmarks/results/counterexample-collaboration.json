@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-27",
+  "source": "human_authored_static_fixture; not an unseen external project",
+  "features": {
+    "mutation_operators": [
+      "drop_storage_write",
+      "shift_boundary",
+      "invert_equality"
+    ],
+    "parser": "esprima==4.0.1 (ECMAScript 2017)",
+    "framework": "openjiuwen==0.1.19.post2",
+    "role_implementation": {
+      "requirements": "real_model",
+      "challenger": "real_model",
+      "executor": "real_model",
+      "evidence_auditor": "deterministic_frozen_obligation_review"
+    },
+    "final_judge": "independent_frozen_predicate_engine"
+  },
+  "real_model_validation": {
+    "campaign_id": "608640ad4f214e7aa3adba62e69fd72e",
+    "state": "completed",
+    "assignment_commitment": "73094b9010183c7e52ecba34d9eb9709f31de3ca6d073398bb011c18ffda2460",
+    "commitment_and_source_integrity_verified": true,
+    "normal_control_passed": true,
+    "known_storage_write_mutant_detected": 1,
+    "model_requests": 14,
+    "trials": [
+      {
+        "run_id": "5b1343423bbc434583f938d13b5c34e2",
+        "verdict": "pass",
+        "status": "completed",
+        "contract_digest": "dfb654b8efca4a80009673562d1469d4770fc2ec1ffd18fcc661afe45b6fdf9f",
+        "model_requests": 8,
+        "role_names": [
+          "challenger",
+          "evidence_auditor",
+          "executor",
+          "requirements",
+          "return"
+        ],
+        "role_event_count": 60
+      },
+      {
+        "run_id": "9647a8d5a5e744009920283e962c0ee3",
+        "verdict": "fail",
+        "status": "completed",
+        "contract_digest": "dfb654b8efca4a80009673562d1469d4770fc2ec1ffd18fcc661afe45b6fdf9f",
+        "model_requests": 6,
+        "role_names": [
+          "challenger",
+          "evidence_auditor",
+          "executor",
+          "requirements",
+          "return"
+        ],
+        "role_event_count": 40
+      }
+    ],
+    "cumulative_reserved_upper_cny": "4.758062",
+    "cumulative_paid_reservations": 71,
+    "approved_limit_cny": 5,
+    "approved_max_requests": 100
+  },
+  "fixed_trace_validation": {
+    "normal_control": "PASS",
+    "storage_write_mutant": "FAIL",
+    "boundary_mutant": "PASS (survived; equivalence/business relevance not independently labelled)",
+    "model_requests": 0
+  },
+  "single_vs_team": {
+    "status": "PROTOCOL_AND_REAL_BROWSER_TEST_ONLY",
+    "transport": "explicit httpx.MockTransport; actual official SDK, real static app and deterministic oracle",
+    "real_paid_comparison": "NOT RUN",
+    "scope": "Same 12 model-attempt / 90 second per-trial caps; no claim of team superiority"
+  },
+  "limitations": [
+    "Only already-previewable HTML/JavaScript projects; no arbitrary backend source execution",
+    "Mutation survival is not defect recall; ineffective/equivalent mutations are not independently labelled",
+    "Blinding is enforced at executor input/tool boundaries, not against a human with server filesystem access",
+    "Model-role analyses may be cached within the same frozen contract/run to reduce calls",
+    "One real controlled fixture cannot establish general success rates"
+  ]
+}

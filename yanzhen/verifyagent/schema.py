@@ -250,7 +250,7 @@ class Decision(Strict):
 
 class RunInput(Strict):
     bundle_id: str
-    planner: Literal["manual", "qwen", "deepseek", "jiuwenswarm", "openjiuwen"]
+    planner: Literal["manual", "qwen", "deepseek", "jiuwenswarm", "openjiuwen", "openjiuwen_team"]
     manual_actions: list[Action] = Field(default_factory=list, max_length=60)
     candidate_target_id: str | None = None
     parent_run: str | None = None
@@ -284,3 +284,6 @@ class Run(Strict):
     parent_run: str | None = None
     error: str | None = None
     reproductions: list[dict] = Field(default_factory=list)
+    collaboration: list[dict] = Field(default_factory=list)
+    challenge_id: str | None = None
+    challenge_slot: str | None = None

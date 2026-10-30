@@ -9,6 +9,7 @@ from . import repository as repo
 from .planning import draft
 from .security import TargetPolicy, Redactor
 from .service import VerifyService
+from .challenges import Prepare as ChallengePrepare, Launch as ChallengeLaunch
 
 
 class DraftInput(Strict):
@@ -50,7 +51,9 @@ def router(service: VerifyService):
         from ..settings import model_config
         import os
         from .jiuwen import availability
-        return {"contract_schema":Bundle.model_json_schema(),"action_schema":Action.model_json_schema(),"planner_modes":["openjiuwen","manual","deepseek","qwen","jiuwenswarm"],
+        return {"contract_schema":Bundle.model_json_schema(),"action_schema":Action.model_json_schema(),"planner_modes":["openjiuwen","openjiuwen_team","manual","deepseek","qwen","jiuwenswarm"],
+                'collaboration':{'roles':['requirements','challenger','executor','evidence_auditor'],'model_roles':3,'final_judge':'deterministic_frozen_oracle'},
+                'counterexamples':{'source':'static_html_javascript','operators':['drop_storage_write','shift_boundary','invert_equality'],'max_mutants':6},
                 "default_planner":os.getenv('YZ_VERIFY_DEFAULT_PLANNER','openjiuwen'), 'openjiuwen':availability(),
                 'project_inputs':['url','github','zip','directory'],
                 "providers":{name:{"enabled":model_config(name)['enabled'],"configured":bool(model_config(name)['key']) or model_config(name)['allow_no_key']} for name in ('deepseek','qwen')},
@@ -121,6 +124,47 @@ def router(service: VerifyService):
                 'supplied':{'contracts':[contract.model_dump(mode='json')]},'actions':[a.model_dump(mode='json') for a in actions],
                 'identities':{'alice':{'header_env':{'X-Test-Actor':'YZ_VERIFY_SECRET_ALICE'}},'bob':{'header_env':{'X-Test-Actor':'YZ_VERIFY_SECRET_BOB'}}}}
 
+    @routes.post('/challenges/example')
+    async def challenge_example(context: Request):
+        local_operator(context)
+        from .challenge_example import create_example
+        return await create_example(service)
+
+    @routes.get('/challenges/candidates/{source_run_id}')
+    def challenge_candidates(source_run_id: str):
+        from .challenges import candidates
+        return candidates(source_run_id)
+
+    @routes.post('/challenges/prepare')
+    def prepare_challenge(request: 'ChallengePrepare', context: Request):
+        local_operator(context)
+        from .challenges import prepare
+        return prepare(request)
+
+    @routes.post('/challenges/{identifier}/start')
+    async def launch_challenge(identifier: str, request: 'ChallengeLaunch', context: Request):
+        local_operator(context)
+        return service.challenges.start(identifier,request)
+
+    @routes.get('/challenges/{identifier}')
+    def challenge_report(identifier: str):
+        from .challenges import read
+        return read(identifier)
+
+    @routes.post('/challenges/{identifier}/cancel')
+    def challenge_cancel(identifier: str, context: Request):
+        local_operator(context)
+        service.challenges.cancel(identifier)
+        return {'cancel_requested':True}
+
+    @routes.get('/challenges/{identifier}/export')
+    def challenge_export(identifier: str):
+        from .challenges import read, directory
+        report=read(identifier)
+        if report['state'] not in {'completed','error','cancelled'} or not report.get('revealed'):
+            raise HTTPException(409,'挑战尚未结束并揭晓')
+        return FileResponse(directory(identifier)/'challenge.zip',filename='counterexample-evidence.zip')
+
     @routes.post("/targets")
     def target(request: Target):
         if request.project_id:
@@ -160,6 +204,11 @@ def router(service: VerifyService):
     def bundle(identifier: str):
         return repo.load_bundle(identifier).model_dump(mode="json")
 
+    @routes.get('/bundles/{identifier}/coverage')
+    def coverage_preview(identifier: str):
+        from .coverage import build_coverage
+        return build_coverage(repo.load_bundle(identifier))
+
     @routes.post("/bundles/{identifier}/versions")
     def version(identifier: str, request: DraftInput):
         parent = repo.load_bundle(identifier)
@@ -188,6 +237,9 @@ def router(service: VerifyService):
     def report(identifier: str):
         run = repo.load_run(identifier)
         data = run.model_dump(mode="json")
+        from .coverage import build_coverage
+        frozen = Bundle.model_validate_json((repo.path('runs', identifier) / 'contract.json').read_text(encoding='utf-8'))
+        data['coverage'] = build_coverage(frozen, run, repo.load_target(run.target_id))
         data["summary"] = {v:sum(r["verdict"]==v for r in run.results) for v in ("pass","fail","blocked","unclear")}
         if run.parent_run and run.status == "completed":
             parent = repo.load_run(run.parent_run)
@@ -210,12 +262,15 @@ def router(service: VerifyService):
     @routes.get("/runs/{identifier}/artifacts/{filename}")
     def artifact(identifier: str, filename: str):
         import re
-        if filename not in {"report.json","contract.json","target.json","manifest.json","evidence.zip"} and not re.fullmatch(r"screen-[a-f0-9]{32}\.png",filename):
+        if filename not in {"report.json","contract.json","target.json","manifest.json","evidence.zip","requirement-coverage.json"} and not re.fullmatch(r"screen-[a-f0-9]{32}\.png",filename):
             raise HTTPException(404,"Not an exportable artifact")
         run = repo.load_run(identifier)
         if run.status not in {"completed","error","cancelled"}:
             raise HTTPException(409,"Evidence is still being written")
         file=repo.path("runs",identifier) / filename
+        if filename == 'requirement-coverage.json' and not file.is_file():
+            from fastapi.responses import JSONResponse
+            return JSONResponse(report(identifier)['coverage'], headers={'Content-Disposition': 'attachment; filename="requirement-coverage.json"'})
         if not file.is_file():raise HTTPException(404,'Artifact has not been produced')
         return FileResponse(file, filename=filename)
 

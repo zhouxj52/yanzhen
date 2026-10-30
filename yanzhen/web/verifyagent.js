@@ -7,11 +7,28 @@ import {
   describeAction,
   contractSummary,
   resultView,
+  metricsView,
+  coverageView,
   traceView,
   logView,
-} from "./verifyagent-view.js?v=intake-7";
+} from "./verifyagent-view.js?v=atelier-10";
+import {ChallengePanel, renderRoles} from './verifyagent-challenges.js?v=atelier-10';
 
 const $ = (selector) => document.querySelector(selector);
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-coverage-filter]');
+  if (!button) return;
+  const panel = button.closest('.va-coverage');
+  const filter = button.dataset.coverageFilter;
+  panel.querySelectorAll('[data-coverage-filter]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+  let visible = 0;
+  panel.querySelectorAll('[data-coverage-state]').forEach(row => {
+    const state = row.dataset.coverageState;
+    row.hidden = filter === 'gaps' ? !['uncovered','partial'].includes(state) : filter === 'problems' ? !['failed','blocked','unclear'].includes(state) : false;
+    if (!row.hidden) visible++;
+  });
+  panel.querySelector('.va-coverage-empty').hidden = visible !== 0;
+});
 const state = {
   target: null,
   bundle: null,
@@ -33,6 +50,7 @@ const state = {
 const terminal = (run) =>
   run && ["completed", "error", "cancelled"].includes(run.status);
 const active = () => state.run && !terminal(state.run);
+const challenges = new ChallengePanel({state, api, error, controls});
 
 async function api(path, body) {
   let response;
@@ -160,7 +178,7 @@ function defaultProvider() {
   const providers = state.config?.providers || {};
   const preferred = state.config?.default_planner || "openjiuwen";
   if (preferred === "manual") return "manual";
-  if (preferred === "openjiuwen" && state.config?.openjiuwen?.ready) return "openjiuwen";
+  if (["openjiuwen","openjiuwen_team"].includes(preferred) && state.config?.openjiuwen?.ready) return preferred;
   if (providers[preferred]?.enabled && providers[preferred]?.configured) return preferred;
   if (state.config?.openjiuwen?.ready) return "openjiuwen";
   return (
@@ -178,9 +196,11 @@ function clearConnection() {
 }
 
 function prepareNew(mode = "own") {
-  if (active())
+  if (active() || challenges.running)
     throw new Error("当前验收仍在执行，请先取消或等待结束，再新建项目。");
   if (state.preview) api(`/projects/${state.preview.project_id}/preview/stop`, {}).catch(error);
+  challenges.reset();
+  renderRoles($('#va-collaboration'),null);
   Object.assign(state, {
     target: null,
     bundle: null,
@@ -212,6 +232,10 @@ function prepareNew(mode = "own") {
   $("#va-repair-target").value = "";
   $("#va-replay-consent").checked = false;
   $("#va-results").innerHTML = "";
+  $('#va-result-metrics').innerHTML = '';
+  $('#va-execution-details').open = true;
+  $('#va-coverage').innerHTML = '';
+  $('#va-coverage-preview').innerHTML = '';
   $("#va-screenshots").innerHTML = "";
   $("#va-plan").textContent = "还没有执行动作。";
   $("#va-log").innerHTML = "";
@@ -367,7 +391,8 @@ async function checkConnection(payload = targetInput()) {
 }
 
 function controls() {
-  const busy = active() || state.drafting || state.checking || state.importing;
+  const busy = active() || state.drafting || state.checking || state.importing || challenges.busy;
+  challenges.syncControls();
   $("#va-import-project").disabled = busy || !$("#va-source-authorized").checked;
   $("#va-import-project").textContent = state.importing ? "正在建立源码快照…" : "导入并预检源码";
   const address = $("#va-url").value.trim(),
@@ -404,6 +429,8 @@ function controls() {
       ? state.mode === "example"
         ? "本次示例：预设清单与操作，不调用大模型，也不产生模型费用。"
         : "手动方式需要开发者提供完整清单与操作；普通项目建议使用已配置的 AI。"
+      : provider === 'openjiuwen_team'
+        ? '候选清单由 openJiuwen 生成；冻结后由需求分析、反例挑战、执行规划与证据审查协作。前三个角色调用模型，共用一次运行的调用预算。'
       : provider === "openjiuwen"
         ? `openJiuwen 官方工作流已就绪，底层模型：${state.config?.openjiuwen?.model_provider || "待配置"}。生成清单与逐步规划会产生实际模型调用。`
         : `将使用 ${providerNames[provider]} 整理清单，生成时会调用已配置的真实模型。`;
@@ -422,9 +449,9 @@ function controls() {
   $("#va-start").textContent = terminal(state.run)
     ? "按原清单再次验收"
     : "开始执行验收";
-  $("#va-new").disabled = !!active();
-  $("#va-show-review").disabled = !!active();
-  $("#va-back-setup").disabled = !!active();
+  $("#va-new").disabled = !!active() || challenges.running;
+  $("#va-show-review").disabled = !!active() || challenges.running;
+  $("#va-back-setup").disabled = !!active() || challenges.running;
   $("#va-cancel").disabled = !active();
   $("#va-approve").disabled =
     !state.run?.pending_approval || state.approvalSending;
@@ -439,6 +466,10 @@ function bundleView() {
     clarification_questions: b.clarification_questions,
   });
   $("#va-contract-summary").innerHTML = contractSummary(b);
+  $('#va-coverage-preview').innerHTML = coverageView(null, true);
+  api(`/bundles/${b.id}/coverage`).then(data => {
+    if (state.bundle?.id === b.id) $('#va-coverage-preview').innerHTML = coverageView(data, true);
+  }).catch(() => { if (state.bundle?.id === b.id) $('#va-coverage-preview').textContent = '关联预览暂不可用，请核对完整需求和检查清单。'; });
   $("#va-review-requirements").textContent = b.requirements;
   $("#va-contract-state").textContent =
     `版本 ${b.version} · ${b.frozen ? "已确认并锁定标准" : "等待你审阅"} · ${b.provider === "manual" ? "人工提供或编辑的检查清单" : "AI 生成的候选清单"}`;
@@ -459,7 +490,7 @@ async function createDraft(event) {
     const requirements = $("#va-requirements").value;
     if (requirements.trim().length < 5)
       throw new Error("请写下具体的功能和预期结果，至少 5 个字。");
-    const provider = $("#va-provider").value;
+    const provider = $("#va-provider").value === 'openjiuwen_team' ? 'openjiuwen' : $("#va-provider").value;
     let supplied;
     if (provider === "manual") {
       try {
@@ -565,8 +596,11 @@ function renderReproductions(run) {
 
 function renderRun(run) {
   const viewingHistory = !$("#va-history-panel").hidden;
+  const previousRun = state.run;
   state.run = run;
   const isActive = !terminal(run);
+  $('#va-execution-panel').dataset.terminal = String(!isActive);
+  if (previousRun?.id !== run.id || terminal(previousRun) !== terminal(run)) $('#va-execution-details').open = isActive;
   $("#va-ready-summary").textContent =
     `本次目标：${state.target.base_url} · 固定清单版本 ${state.bundle.version} · ${providerNames[run.planner] || run.planner}。`;
   $("#va-run-state").textContent =
@@ -594,8 +628,11 @@ function renderRun(run) {
               ? "本轮操作规划已结束，正在按清单核对实际观测。"
               : "尚未产生操作计划，等待读取项目的实际状态。";
   $("#va-log").innerHTML = logView(run);
+  renderRoles($('#va-collaboration'),run);
   $("#va-trace").innerHTML = traceView(run, isActive);
   $("#va-results").innerHTML = resultView(run);
+  $('#va-result-metrics').innerHTML = metricsView(run);
+  $('#va-coverage').innerHTML = coverageView(run.coverage);
   const counts = Object.fromEntries(
     ["pass", "fail", "blocked", "unclear"].map((key) => [
       key,
@@ -633,6 +670,12 @@ function renderRun(run) {
 async function follow(identifier) {
   if (state.polling)
     throw new Error("当前已经有一次验收正在显示，请先等待结束或取消。");
+  const currentURL = new URL(location.href);
+  if (!currentURL.searchParams.has('challenge')) {
+    currentURL.searchParams.set('run', identifier);
+    currentURL.searchParams.delete('view');
+    history.replaceState(null, '', currentURL.pathname + currentURL.search);
+  }
   state.polling = true;
   try {
     for (;;) {
@@ -653,13 +696,32 @@ async function refreshHistory() {
     rows
       .map(
         (r) =>
-          `<button data-run="${esc(r.id)}">${esc(statusNames[r.status] || r.status)} · ${esc(providerNames[r.planner] || r.planner)}<span>${esc(new Date(r.created_at).toLocaleString("zh-CN"))} · ${esc(r.id.slice(0, 8))}</span></button>`,
+          `<button data-run="${esc(r.id)}"><span class="va-history-icon"><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#file-check"/></svg></span><span class="va-history-copy"><strong>${esc(providerNames[r.planner] || r.planner)}</strong><small>${esc(new Date(r.created_at).toLocaleString("zh-CN"))} · 记录 ${esc(r.id.slice(0, 8))}</small></span><span class="va-history-status" data-status="${esc(r.status)}">${esc(statusNames[r.status] || r.status)}</span><svg class="va-icon" aria-hidden="true"><use href="/static/verifyagent-icons.svg#chevron"/></svg></button>`,
       )
       .join("") ||
     '<p class="va-hint">还没有验收记录。可以先体验一个示例。</p>';
+  filterHistory();
 }
 
+function filterHistory() {
+  const query = $('#va-history-search').value.trim().toLocaleLowerCase();
+  const rows = [...document.querySelectorAll('#va-history [data-run]')];
+  let count = 0;
+  rows.forEach(row => { row.hidden = !(`${row.textContent} ${row.dataset.run}`.toLocaleLowerCase().includes(query)); if (!row.hidden) count++; });
+  $('#va-history-count').textContent = query ? `找到 ${count} 条记录 · 当前已载入 ${rows.length} 条` : `已载入最近 ${rows.length} 条验收记录`;
+}
+$('#va-history-search').addEventListener('input', filterHistory);
+document.querySelectorAll('[data-intake]').forEach(button => button.addEventListener('click', () => {
+  try {
+    prepareNew();
+    const radio = document.querySelector(`input[name="project-source"][value="${button.dataset.intake}"]`);
+    radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true}));
+    showStage(0);
+  } catch (err) { error(err); }
+}));
+
 async function loadHistoryRun(id) {
+  if (challenges.running) throw new Error('请先等待或取消当前反例挑战，再切换验收记录。');
   if (state.polling) throw new Error("请先等待当前验收完成，再查看其他记录。");
   const run = await api("/runs/" + id);
   state.bundle = await api("/bundles/" + run.bundle_id);
@@ -806,6 +868,20 @@ bind("#va-start", async () => {
   await follow(run.id);
 });
 bind("#va-cancel", () => api(`/runs/${state.run.id}/cancel`, {}));
+bind('#va-challenge-example',async ()=>{
+  if(active() || challenges.running) throw new Error('请先完成当前验收。');
+  const sample=await api('/challenges/example',{});
+  prepareNew('example');
+  state.project=sample.project;state.preview=sample.preview;
+  $('#va-url').value=sample.preview.base_url;
+  $('#va-requirements').value=sample.requirements;
+  $('#va-supplied').value=pretty(sample.supplied);
+  $('#va-actions').value=pretty(sample.actions);
+  $('#va-provider').value='manual';$('#va-interface').value='web';
+  $('#va-example-note').hidden=false;
+  $('#va-example-note').textContent='这是人工编写的正常源码与清单。先确认并实际验收；通过后，在结果中展开“反例挑战”，再测试这套验收能否发现变异。示例基线不调用模型。';
+  renderProject();showStage(0);controls();
+});
 for (const [id, approved] of [
   ["#va-approve", true],
   ["#va-deny", false],
@@ -911,6 +987,7 @@ document.querySelectorAll("[data-example]").forEach((button) =>
 try {
   state.config = await api("/capabilities");
   $("#va-service").textContent = "服务连接正常";
+  $('#va-service').parentElement.dataset.connection = 'online';
   for (const name of ["deepseek", "qwen"])
     $(`#va-provider option[value=${name}]`).disabled =
       !state.config.providers[name].enabled ||
@@ -918,6 +995,7 @@ try {
   $("#va-provider option[value=jiuwenswarm]").disabled =
     !state.config.swarm_sdk_installed || !state.config.swarm_configured;
   $("#va-provider option[value=openjiuwen]").disabled = !state.config.openjiuwen?.ready;
+  $("#va-provider option[value=openjiuwen_team]").disabled = !state.config.openjiuwen?.ready;
   if (state.mode !== "example") $("#va-provider").value = defaultProvider();
   $("#va-allowlist").textContent =
     "服务器当前允许：" +
@@ -930,7 +1008,14 @@ try {
   if (/^[a-f0-9]{32}$/.test(requestedRun || ""))
     await loadHistoryRun(requestedRun);
   else if (parameters.get("view") === "history") showHistory();
+  const challengeId=parameters.get('challenge');
+  if (/^[a-f0-9]{32}$/.test(challengeId || '')) {
+    const report=await api('/challenges/'+challengeId);
+    if(state.run?.id!==report.source_run_id) await loadHistoryRun(report.source_run_id);
+    await challenges.restore(report);
+  }
 } catch (err) {
   $("#va-service").textContent = "后台暂不可用";
+  $('#va-service').parentElement.dataset.connection = 'offline';
   error(err);
 }

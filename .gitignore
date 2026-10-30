@@ -6,6 +6,8 @@ __pycache__/
 .pytest_cache/
 *.pyc
 .env
+.env.*
+!.env.example
 *.log
 *.egg-info/
 build/

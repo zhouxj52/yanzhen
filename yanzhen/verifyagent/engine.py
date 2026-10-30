@@ -19,6 +19,11 @@ async def execute(run: Run, request: RunInput, approve: Callable, *, planner=Non
     target = load_target(run.target_id)
     executor = ToolExecutor(target, run, TargetPolicy(target))
     model = ModelClient(request.planner, max_calls=request.max_model_calls) if request.planner != "manual" else None
+    if model and request.planner == 'openjiuwen_team':
+        def role_event(item):
+            run.collaboration.append(executor.redact(item))
+            save_run(run)
+        model.on_role_event = role_event
     planner = planner or (ModelPlanner(model,target) if model else ManualPlanner(request.manual_actions))
     run.status = "running"
     started = time.monotonic()

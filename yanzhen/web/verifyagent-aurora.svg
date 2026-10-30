@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" fill="none">
+  <defs>
+    <linearGradient id="base" x1="150" y1="80" x2="1450" y2="1100" gradientUnits="userSpaceOnUse"><stop stop-color="#e5edf7"/><stop offset=".48" stop-color="#eef1fa"/><stop offset="1" stop-color="#e9e4f1"/></linearGradient>
+    <linearGradient id="ribbon" x1="1460" y1="40" x2="860" y2="1070" gradientUnits="userSpaceOnUse"><stop stop-color="#9fb7f2"/><stop offset=".42" stop-color="#89a9e9"/><stop offset=".72" stop-color="#b5afea"/><stop offset="1" stop-color="#e4cde2"/></linearGradient>
+    <linearGradient id="ice" x1="-120" y1="780" x2="950" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#95c5dd"/><stop offset=".45" stop-color="#b3d8e6"/><stop offset="1" stop-color="#d5e5f7"/></linearGradient>
+    <linearGradient id="edge" x1="1100" y1="0" x2="1260" y2="1100" gradientUnits="userSpaceOnUse"><stop stop-color="#fbfdff"/><stop offset=".48" stop-color="#dbe6fc"/><stop offset="1" stop-color="#f9ecf6"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#fff" stop-opacity=".98"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pearl"><stop stop-color="#f9e9dc" stop-opacity=".85"/><stop offset="1" stop-color="#f9e9dc" stop-opacity="0"/></radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="bloom"><feGaussianBlur stdDeviation="65"/></filter>
+  </defs>
+  <path fill="url(#base)" d="M0 0h1600v1100H0z"/>
+  <ellipse cx="460" cy="220" rx="600" ry="480" fill="url(#light)"/>
+  <ellipse cx="1430" cy="800" rx="530" ry="460" fill="url(#pearl)"/>
+  <g filter="url(#soft)">
+    <path d="M1690-140c-403 95-559 222-505 397 55 177 318 200 238 395-89 216-466 213-461 544h738V-140Z" fill="url(#ribbon)"/>
+    <path d="M1680-113c-375 102-541 219-486 380 61 180 317 210 234 399-97 220-455 229-450 523" stroke="url(#edge)" stroke-width="27" stroke-opacity=".9"/>
+    <path d="M-270 1175C-89 844 159 997 267 780c88-177-31-285 185-379C663 309 873 377 1050 157c-60 245-264 257-438 335-194 87-38 239-176 411-146 182-317 138-391 335Z" fill="url(#ice)" opacity=".9"/>
+    <path d="M-198 1130C-38 885 176 999 278 780c87-187-19-281 191-374 209-92 390-38 563-230" stroke="#eafdff" stroke-width="18" stroke-opacity=".65"/>
+  </g>
+  <ellipse cx="760" cy="650" rx="420" ry="380" fill="url(#light)" opacity=".78"/>
+  <ellipse cx="850" cy="1100" rx="430" ry="220" fill="#d9d0ee" opacity=".55" filter="url(#bloom)"/>
+</svg>

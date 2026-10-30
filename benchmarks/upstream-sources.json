@@ -1,0 +1,78 @@
+{
+  "format_version": 1,
+  "scope": "Pinned upstream files fetched into ignored cache only; no upstream business code is redistributed or patched. NOASSERTION means no license declared in the selected repository.",
+  "repositories": [
+    {
+      "id": "vanilla",
+      "repository": "https://github.com/bradtraversy/vanillawebprojects",
+      "repo": "bradtraversy/vanillawebprojects",
+      "commit": "adc66a181a67049fb413c8862181ddc6c45ba22b",
+      "license": "NOASSERTION",
+      "files": [
+        {
+          "path": "expense-tracker/index.html",
+          "sha256": "1fcd416f8cc0a06da6642243ba9757e64b80a16ad7cc37fafbf7a6eff3f39cf5",
+          "git_blob_sha1": "dae929cce1c2d5db2608f58f26d7acbd1bd2c394",
+          "size": 1512
+        },
+        {
+          "path": "expense-tracker/script.js",
+          "sha256": "94708604d07af5f886668feda1020a6a2702660750a500fc46ea3ec7e474967b",
+          "git_blob_sha1": "393de5724d10b033ea96301c25701d2fa7e74ac8",
+          "size": 2917
+        },
+        {
+          "path": "expense-tracker/style.css",
+          "sha256": "f0c005da8c8a69c0f2801d65f10774d4c37992d77a7cea11f5a3fcd79663e04f",
+          "git_blob_sha1": "a7b5ba096b0fe21d0009a09eec5fb6a1a7c6b3b2",
+          "size": 2290
+        },
+        {
+          "path": "form-validator/index.html",
+          "sha256": "677af9949c922d45113c4fbae9a7d9711b1720a414014ad4065e497b1d931301",
+          "git_blob_sha1": "f90e0f68351d20fe55ffa29bdfde0105d044dd6b",
+          "size": 1444
+        },
+        {
+          "path": "form-validator/script.js",
+          "sha256": "3c3fbcfda2eb07abba9ef94ba453c5a2dce5a51c60fb17affb3a635f744b7684",
+          "git_blob_sha1": "9e2a904355dcea128cde8ed63714132ef0eb8f6b",
+          "size": 2274
+        },
+        {
+          "path": "form-validator/style.css",
+          "sha256": "925a786766327b908b0be0c6b400619679a76f71931092004dae8490492229a3",
+          "git_blob_sha1": "8e04ac47780eb046e2bd7c9685fd0d48ffd7503d",
+          "size": 1480
+        },
+        {
+          "path": "readme.md",
+          "sha256": "2cd40460393700c92a5c868469284f8a8861b6096477565fd8cfca573f99d8b1",
+          "git_blob_sha1": "ff7c8a97d2e16a06b16019d0d3bc4bb925f58f07",
+          "size": 4505
+        }
+      ]
+    },
+    {
+      "id": "mdn-learning",
+      "repository": "https://github.com/mdn/learning-area",
+      "repo": "mdn/learning-area",
+      "commit": "21973263ba859ff3477919087b488157f9d618a6",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "path": "javascript/apis/document-manipulation/shopping-list-finished.html",
+          "sha256": "0a48f23009475e60cf5cf1805612ab01dc4280e17e0d0df8bb5cc609428898e4",
+          "git_blob_sha1": "da1f376fea2eb53b76603b46c907f60b20571bf0",
+          "size": 1438
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+          "git_blob_sha1": "670154e3538863b2d9891fd5483160fbdfc89164",
+          "size": 6555
+        }
+      ]
+    }
+  ]
+}

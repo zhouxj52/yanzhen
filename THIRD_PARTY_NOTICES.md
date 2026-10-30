@@ -11,6 +11,7 @@
 | https://github.com/encode/httpx | HTTP 调用 | BSD-3-Clause |
 | https://github.com/encode/httpcore | 固定 TCP 目标 IP，同时保留域名、TLS 与 Cookie 的传输层 | BSD-3-Clause |
 | https://github.com/openJiuwen-ai/agent-core | openJiuwen 官方 Workflow 编排，固定发布包 0.1.19.post2 | Apache-2.0 |
+| https://github.com/Kronuz/esprima-python | ECMAScript 2017 语法树解析和变异前后语法校验，固定 4.0.1；不执行目标脚本 | BSD-2-Clause |
 | https://github.com/pydantic/pydantic | 结构校验 | MIT |
 | https://github.com/microsoft/playwright | 浏览器执行、截图和 trace | Apache-2.0 |
 | https://github.com/modelcontextprotocol/python-sdk | stdio MCP 服务与联调 | MIT |
@@ -38,6 +39,13 @@ RealWorld、BrowserGym、WebArena、MiniWoB++ 本轮仅作调研，未复用源�
 服务副本只调整浏览器模块导入、移除 webpack HMR / CSS 包导入，配上本地展示 CSS。上游 Store / Model / Controller / View 业务逻辑保留；healthy 对照场景显式替换内存存储为 localStorage 并调整 ID 起点，此修改不是上游原版。TodoMVC 是外部开源示例，不是本项目原创业务应用，也不是完整企业系统。
 
 自主实现范围是目标适配、冻结契约关联、证据冲突规则、独立环境删减与确认、受限执行计划审查及前端报告。
+
+## 2026-10-28 扩展评测来源
+
+- [bradtraversy/vanillawebprojects](https://github.com/bradtraversy/vanillawebprojects/tree/adc66a181a67049fb413c8862181ddc6c45ba22b)：固定提交 `adc66a181a67049fb413c8862181ddc6c45ba22b`，仅下载 Expense Tracker、Form Validator 及仓库说明到忽略的 D 盘缓存，未修改业务源码。所选仓库未声明许可证，记录为 `NOASSERTION`；业务源码不随验真分发，只发布来源、文件哈希及自主编写的验收协议。表单分支问题由本地审阅和独立原始浏览器步骤确认，不代表上游维护者确认。
+- [MDN learning-area](https://github.com/mdn/learning-area/tree/21973263ba859ff3477919087b488157f9d618a6)：固定提交 `21973263ba859ff3477919087b488157f9d618a6`，CC0-1.0。下载完成版 `shopping-list-finished.html` 与 LICENSE 到忽略缓存；没有把教学空白模板当作完成项目。原业务源码未改动，新增评测仅检查选定的清单增删及字面文本行为。
+
+新增文件的 SHA-256、Git blob 和固定提交见 `benchmarks/upstream-sources.json`。静态测试服务仅提供清单文件，并通过响应头限制外部连接；该限制不修改源码。Petclinic 与 Juice Shop 继续使用上文固定版本；5 个应用来自 4 个仓库。新增结果不计入官方完整套件成绩或陌生项目自主成功率。
 
 ## 前端设计参考（来源）
 

@@ -1,0 +1,1629 @@
+{
+  "date": "2026-10-28",
+  "protocol": "upstream-fixed-plans-v3",
+  "protocol_digest": "3ae3fb5a75492645b65d17a426eab4e31e40e2964baa0cdfa466d658a452e3fe",
+  "subset": false,
+  "execution_mode": "explicit_manual",
+  "applications": 5,
+  "upstream_repositories": 4,
+  "summary": {
+    "registered_cases": 49,
+    "executed_cases": 49,
+    "completed_cases": 49,
+    "verdicts": {
+      "pass": 43,
+      "fail": 6
+    },
+    "normal_cases": 43,
+    "normal_passed": 43,
+    "false_positive_cases": 0,
+    "labelled_defect_cases": 6,
+    "detected_defect_cases": 6,
+    "labelled_defect_groups": 2,
+    "detected_defect_groups": 2,
+    "blocked_or_unclear": 0,
+    "matched_expectations": 49,
+    "detection_fraction": {
+      "numerator": 6,
+      "denominator": 6
+    },
+    "false_positive_fraction": {
+      "numerator": 0,
+      "denominator": 43
+    },
+    "model_requests": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "execution_ms": 75165,
+    "autonomous_success_rate": null,
+    "scope": "Selected source-labelled fixed-plan integration cases; repeated cases from one defect group are not separate bugs."
+  },
+  "source_lock": "benchmarks/upstream-sources.json",
+  "source_versions": {
+    "static_lock_digest": "49c8a24edfe87cc0118985f4b9edf29a99897d12941cc4de8bd0fd00208dd661",
+    "legacy": {
+      "petclinic": {
+        "repository": "https://github.com/spring-projects/spring-petclinic",
+        "commit": "500158f732419217507c7656904b8e6aa1bcc0d6",
+        "license": "Apache-2.0"
+      },
+      "juice-shop": {
+        "repository": "https://github.com/juice-shop/juice-shop",
+        "release": "v20.3.0",
+        "license": "MIT",
+        "asset_url": "https://github.com/juice-shop/juice-shop/releases/download/v20.3.0/juice-shop-20.3.0_node24_win32_x64.zip",
+        "asset_sha256": "a25fc33b3b3565aae52381f63e6c9727790f67e8443ead02803a8eec7bdb7f57"
+      }
+    }
+  },
+  "local_legacy_files": {
+    "petclinic": {
+      "commit": "500158f732419217507c7656904b8e6aa1bcc0d6",
+      "tracked_source_clean": true,
+      "local_jar_sha256": "6e6b8b696c97d03fbb96ceff5c342cf1218c5bfc83615228da9619bfe9059a47",
+      "deployment_link": "operator_declared"
+    },
+    "juice-shop": {
+      "release": "v20.3.0",
+      "local_entry_sha256": "aecfa75363ab27d8a50961f48d338e163683c0f5360862d27de755afc233db46",
+      "original_asset_sha256": "a25fc33b3b3565aae52381f63e6c9727790f67e8443ead02803a8eec7bdb7f57",
+      "deployment_link": "operator_declared; local entry hash is not an attestation of complete build provenance"
+    }
+  },
+  "label_provenance": "Engineer source/test review plus separate raw-browser reference on local form defect; no independent human panel or unseen-project blind evaluation.",
+  "reference_observer": "Separate raw Playwright browser steps confirmed all five locally source-reviewed form defect cases, without using ToolExecutor or its oracle.",
+  "applications_results": [
+    {
+      "application": "petclinic",
+      "registered": 22,
+      "verdicts": {
+        "pass": 22
+      }
+    },
+    {
+      "application": "juice-shop",
+      "registered": 9,
+      "verdicts": {
+        "pass": 8,
+        "fail": 1
+      }
+    },
+    {
+      "application": "expense-tracker",
+      "registered": 7,
+      "verdicts": {
+        "pass": 7
+      }
+    },
+    {
+      "application": "form-validator",
+      "registered": 7,
+      "verdicts": {
+        "pass": 2,
+        "fail": 5
+      }
+    },
+    {
+      "application": "shopping-list",
+      "registered": 4,
+      "verdicts": {
+        "pass": 4
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "search-owner",
+      "title": "按姓氏查找",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "2f54984464d14639bc9677497686a6f5",
+      "contract_digest": "1e9b65df4f3443ebe659d8a99c5a4f2907a66c1980b783f8dbec94af562d5a18",
+      "steps": 3,
+      "elapsed_ms": 2016,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "search-trim",
+      "title": "查找自动去除首尾空白",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "0efa58fb8d5847bcb789b57cf6f65330",
+      "contract_digest": "f52ecfaa73bab5bee946543a22b2f42066eee4ebc63bbb1670c009cc63f39f4e",
+      "steps": 3,
+      "elapsed_ms": 1766,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "search-missing",
+      "title": "无匹配记录给出提示",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "e841451bb0104bc58f1742cf5bdcf93f",
+      "contract_digest": "89382680dcc8de52e9a18923e93ada037fb849c8ec1ea4934fee05bf76434e0c",
+      "steps": 3,
+      "elapsed_ms": 1763,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-create",
+      "title": "新建主人：create",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "803f0dd8e5944887bff2694d7cdf4733",
+      "contract_digest": "c1ac69bb5e184adda2f5b946c40eed2eda83106c872d7a7149009cd3b9311d0c",
+      "steps": 8,
+      "elapsed_ms": 2171,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-address-max",
+      "title": "新建主人：address-max",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "b65465d04d644f089b0dab2f6fc1a02d",
+      "contract_digest": "9aa52cd6d55ee0be646a00a8fde2dd1d2549456306993015454c9243043c31ac",
+      "steps": 8,
+      "elapsed_ms": 2077,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-city-max",
+      "title": "新建主人：city-max",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "4708cd2e04794f0cbe5d8147f56b7c15",
+      "contract_digest": "feb59a71d2f784235840bc31029018ff563b135ea25ffef84f3093f6fb5d906e",
+      "steps": 8,
+      "elapsed_ms": 2054,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-address-over",
+      "title": "新建主人：address-over",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "4ca08a32fec74efb96d4f39fc0ece356",
+      "contract_digest": "53dc378ea54d38b8980ea719a97a04c9332dce52dba1e5312170d5a4497a6188",
+      "steps": 7,
+      "elapsed_ms": 1960,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-city-over",
+      "title": "新建主人：city-over",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "b9efb38040c84851843bf860371a20c7",
+      "contract_digest": "25a22f98d9d54574d2b1e38b4bf82ca6d008bc7ddad38d547e4d9f39f6a83766",
+      "steps": 7,
+      "elapsed_ms": 1878,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-address-required",
+      "title": "新建主人：address-required",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "2b3c8ed51a0f4ef6975d713a1154dfbe",
+      "contract_digest": "db6d2f333eb7f15e34610a65b49a974a2c05e96327176e97df930d3be7bd8ae2",
+      "steps": 7,
+      "elapsed_ms": 1890,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-name-required",
+      "title": "新建主人：name-required",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "26d110aa6690490c9de7b5a3307bfe95",
+      "contract_digest": "e47cc24202a3e191655bf470bca51ad4108a15c1c3c3e1c4cc499d45075e2ad3",
+      "steps": 7,
+      "elapsed_ms": 1915,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-phone-short",
+      "title": "新建主人：phone-short",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "c86f6d686a5c4fda9df7474d5815ccda",
+      "contract_digest": "29b32f9068303e0050f3f487e7d2be03c2c447568edebc8a1a70f30c65482bfa",
+      "steps": 7,
+      "elapsed_ms": 1926,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-phone-long",
+      "title": "新建主人：phone-long",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "2948e9547f4f48b482e753dcbee58764",
+      "contract_digest": "7a66c2ddee02fddb7ff8bea2e186cb1b0ee1c6784e63e7250c627b2c76932226",
+      "steps": 7,
+      "elapsed_ms": 1933,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-phone-letters",
+      "title": "新建主人：phone-letters",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/java/org/springframework/samples/petclinic/owner/Owner.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "9782fe7b1f5f44ba99a62524bc7a5fe3",
+      "contract_digest": "96db90c0aa52c5e84adc1ba5d7dd01043d5ea375668fe3d639901b68823f4db4",
+      "steps": 7,
+      "elapsed_ms": 2007,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "owner-edit",
+      "title": "编辑主人并刷新验证",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/OwnerControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "38b0999cb61343b18a0181b05d816de2",
+      "contract_digest": "3e6865a4a114e6775d3f16144c46c724f92769bda16878dccfcf9ce9ef6a796b",
+      "steps": 4,
+      "elapsed_ms": 1843,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "pet-create",
+      "title": "宠物：create",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/PetControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "b2b819a5ee1a426e980cbfcc766207cb",
+      "contract_digest": "ef26868dd19c713c5f1215e2ff8ee55bf18e9c17ccb449d223876022dce7ba5f",
+      "steps": 6,
+      "elapsed_ms": 1942,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "pet-name-required",
+      "title": "宠物：name-required",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/PetControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "9d6167ece6eb4f269e31eeb28295d6e0",
+      "contract_digest": "3f5705eb1cee04e6a68f8152079fe6ba5d2d648834633dccfc780798d95b7644",
+      "steps": 5,
+      "elapsed_ms": 1833,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "pet-duplicate",
+      "title": "宠物：duplicate",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/PetControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "fe05b4adeaa84234aa893b6a9f086c80",
+      "contract_digest": "9b54663569836404dc187596a4c53fd057740c29655bd0ff52060567ca4e7ba4",
+      "steps": 5,
+      "elapsed_ms": 1805,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "pet-future-birth",
+      "title": "宠物：future-birth",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/PetControllerTests.java"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "6f97a3918d6143169e3fd662944d19f6",
+      "contract_digest": "81fd884fc0a4a7d0f7da37952d64d340d25f6befe9545f17a36d4d42576152c3",
+      "steps": 5,
+      "elapsed_ms": 1822,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "visit-create",
+      "title": "就诊：create",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/VisitControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/resources/templates/fragments/inputField.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "b6d1c51a982d493398085cc07d76d1ee",
+      "contract_digest": "f72698795d30ca885ef64fccfb29ab265ec1da4df5423a2d52cae4c3c4dfbd74",
+      "steps": 5,
+      "elapsed_ms": 1861,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "visit-required",
+      "title": "就诊：required",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/VisitControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/resources/templates/fragments/inputField.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "c205c27a47904a079d21d239e2737043",
+      "contract_digest": "700857604343a5404cbfae646c3712d435d0d75acc452c8404364c13091eefbd",
+      "steps": 4,
+      "elapsed_ms": 1846,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "visit-description-over",
+      "title": "就诊：description-over",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/VisitControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/resources/templates/fragments/inputField.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "6fa1ed3b414146b3946ad4a19d814310",
+      "contract_digest": "bc48735b3b5ab8599e5ab49e4f05242f4d7fc043c3e68229219b211cca76c84d",
+      "steps": 4,
+      "elapsed_ms": 1809,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "visit-date-today",
+      "title": "就诊：date-today",
+      "project": "petclinic",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/test/java/org/springframework/samples/petclinic/owner/VisitControllerTests.java",
+          "https://github.com/spring-projects/spring-petclinic/blob/500158f732419217507c7656904b8e6aa1bcc0d6/src/main/resources/templates/fragments/inputField.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "d6cdd8b7d5f042e790356e6b7f90eb6c",
+      "contract_digest": "f2415bc68eb1badd4b127603536581d714ca9f5b6330291eccbbbbe54728b3a0",
+      "steps": 5,
+      "elapsed_ms": 2279,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-search",
+      "title": "公开商品搜索",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/search.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "38c98f8553ce402fb68d46471fc66d32",
+      "contract_digest": "06797343eb36108183d4db609967b473a76a163280740b604815f6012e304180",
+      "steps": 1,
+      "elapsed_ms": 279,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-search-empty",
+      "title": "无匹配商品返回空列表",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/search.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "96ececa60a8c46a290a8c927aa0aca04",
+      "contract_digest": "f69ccea4e52960564491e7d94077c42e567b6b2490b7f5addfb1afbc2f32e27a",
+      "steps": 1,
+      "elapsed_ms": 201,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-auth-required",
+      "title": "匿名访问购物车被拒绝",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/server.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "d3e731e253534af3b248ea5c77d222fe",
+      "contract_digest": "5da0a89dd4722e59399c98f682e2453bba4120438ee930c7065c797f57a1eb39",
+      "steps": 1,
+      "elapsed_ms": 187,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-own-empty",
+      "title": "本人购物车初始为空",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/basket.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "0b1fbf0ea79047d2b4c02bb71407e256",
+      "contract_digest": "ae396591caeb88cd6b3cea421c32250d594b44d9e5e9d94ae914535d543a3b58",
+      "steps": 1,
+      "elapsed_ms": 397,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-cart-add",
+      "title": "加入本人购物车后可重新查询",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/basketItems.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "80767fb05469487b987924a8c809b651",
+      "contract_digest": "da2c237934032e56ac2e03b879502f3e4a2a69d6b3c6d581197fc34b8f2bfe1d",
+      "steps": 1,
+      "elapsed_ms": 419,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-cart-update",
+      "title": "购物车数量修改",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/basketItems.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "108d0b49a8f74c32b3aafa690e9a80d3",
+      "contract_digest": "b86fe7e70acd5a7aa0da2444b5b43be312ce26f2460e02047c9a9c7bd1de8c28",
+      "steps": 1,
+      "elapsed_ms": 392,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-cart-delete",
+      "title": "移除购物车条目",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/server.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "e8a96a4a0a134ca0b7c00998407ca072",
+      "contract_digest": "b89e7d46a605920755321d09602975bcdd38bd069b35cbd20bba27b8d8af5f03",
+      "steps": 1,
+      "elapsed_ms": 400,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-write-other-denied",
+      "title": "常规跨账户加购不改变他人数据",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/basketItems.ts"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "c848eaac48b840ecb0eb3a76c8e0d527",
+      "contract_digest": "f636287ae502df66b9394dfc26f249a47eb1975c7b19ff59b4880da1e1d06e62",
+      "steps": 1,
+      "elapsed_ms": 588,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shop-read-other-known-bug",
+      "title": "已知缺陷：跨账户读取购物车",
+      "project": "juice-shop",
+      "label": {
+        "expected_verdict": "fail",
+        "kind": "upstream_documented_defect",
+        "defect_group": "juice-cross-account-basket-read",
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/routes/basket.ts",
+          "https://github.com/juice-shop/juice-shop/blob/v20.3.0/data/static/challenges.yml"
+        ]
+      },
+      "actual": "fail",
+      "run_id": "91017cda8db64a88b9880badf36e54e0",
+      "contract_digest": "b0554d907049df9ef41143488f4f34d2bd067b1cde2b619b6f22570169a477e4",
+      "steps": 1,
+      "elapsed_ms": 600,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 0,
+        "failed": 2,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-income",
+      "title": "收支保存与汇总：expense-income",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "2919ac788f504b9da74cf431139d1a68",
+      "contract_digest": "9ec0241dc1a260346d621223415c7800acb9101c4a3b9296e9c8ff4588241db3",
+      "steps": 4,
+      "elapsed_ms": 1827,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-outgoing",
+      "title": "收支保存与汇总：expense-outgoing",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "b7d02c81382f4e0fa03182095549cf0f",
+      "contract_digest": "3ceaead261cfe17d727e274c9d463e5c84df4bf3cb517538389e2e7d31f5a224",
+      "steps": 4,
+      "elapsed_ms": 1703,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-balance",
+      "title": "收支保存与汇总：expense-balance",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "2edb84a15635467a82f7f230a26ce98c",
+      "contract_digest": "76618a7409301fc840f27fdff035e948116889829ae5ce7cef2a4ed54894a03b",
+      "steps": 7,
+      "elapsed_ms": 1844,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-delete",
+      "title": "删除收支并刷新",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "6a1a71e7a368483cbed37674aa564a74",
+      "contract_digest": "0aa10606da56671703ae73c6c8ce63f289d10974d9116c3d482ba2ccb95a4b1f",
+      "steps": 5,
+      "elapsed_ms": 1759,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-fraction-native-validation",
+      "title": "小数金额的原生表单约束",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/index.html",
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "7d866ed7262d4443881a556e353d0b47",
+      "contract_digest": "0d1f99dae430c13b03585b44729c53227fb1ecc5a697e4fe7c554b5b1dc7b02c",
+      "steps": 7,
+      "elapsed_ms": 2139,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 2,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-empty-label",
+      "title": "空收支输入不保存：expense-empty-label",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "22ba6f0f33bc48d7b50341b051135a6d",
+      "contract_digest": "2fe892d5807ecbfe7f4533fb5bed1929a4ba0462b1f664d94c2b186541456322",
+      "steps": 4,
+      "elapsed_ms": 1737,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "expense-empty-amount",
+      "title": "空收支输入不保存：expense-empty-amount",
+      "project": "expense-tracker",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/expense-tracker/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "892fb9ee471d40eaafbd736b23a794a7",
+      "contract_digest": "631d5abbde787617cf10071ed101126e031449bd6ad02c8eedb4c9a398d0b5cb",
+      "steps": 4,
+      "elapsed_ms": 1818,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-valid",
+      "title": "表单校验：form-valid",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "32e657a0879844adb94584c2f06f09eb",
+      "contract_digest": "c393b496d7b1f5a004b1effafc221782fa8d83e4e3096d57de7ea87a31a9839e",
+      "steps": 5,
+      "elapsed_ms": 1506,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-empty",
+      "title": "表单校验：form-empty",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "2adbc1425f7a4d4a8e05d9766a97ada5",
+      "contract_digest": "e56fa1241852d7a98002a7012c5a5daac8d46ac2fdecca801560323f0f9bff8a",
+      "steps": 5,
+      "elapsed_ms": 1591,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-short-username",
+      "title": "表单校验：form-short-username",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "fail",
+        "kind": "local_source_reviewed_defect",
+        "defect_group": "form-validator-required-branch",
+        "basis": "Local source review: checkRequired=true means at least one field is empty, but deeper checks only run in that branch. Not an upstream-maintainer-confirmed issue.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "fail",
+      "run_id": "7a4c4639aef54a89972e916183274582",
+      "contract_digest": "1026ca8bb9a3108087361620247109a25c057f2b0001b1aecf71deeff6a75f36",
+      "steps": 5,
+      "elapsed_ms": 1520,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 0,
+        "failed": 2,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-long-username",
+      "title": "表单校验：form-long-username",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "fail",
+        "kind": "local_source_reviewed_defect",
+        "defect_group": "form-validator-required-branch",
+        "basis": "Local source review: checkRequired=true means at least one field is empty, but deeper checks only run in that branch. Not an upstream-maintainer-confirmed issue.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "fail",
+      "run_id": "284bc5336f134e5dab01d7b1556bef39",
+      "contract_digest": "a4b8a1db5740c3c8ce068935f0d15842dd6b9870ef3aef2b10dd05a5b19c9aa4",
+      "steps": 5,
+      "elapsed_ms": 1466,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 0,
+        "failed": 2,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-invalid-email",
+      "title": "表单校验：form-invalid-email",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "fail",
+        "kind": "local_source_reviewed_defect",
+        "defect_group": "form-validator-required-branch",
+        "basis": "Local source review: checkRequired=true means at least one field is empty, but deeper checks only run in that branch. Not an upstream-maintainer-confirmed issue.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "fail",
+      "run_id": "a01bd7dff0a4454e8d85116e3b92d946",
+      "contract_digest": "a5aa376c41ebc79cf637d251a7114049f3fca503796270f8a47c9c3b174be406",
+      "steps": 5,
+      "elapsed_ms": 1459,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 0,
+        "failed": 2,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-short-password",
+      "title": "表单校验：form-short-password",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "fail",
+        "kind": "local_source_reviewed_defect",
+        "defect_group": "form-validator-required-branch",
+        "basis": "Local source review: checkRequired=true means at least one field is empty, but deeper checks only run in that branch. Not an upstream-maintainer-confirmed issue.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "fail",
+      "run_id": "e4a56dfce473455ea5b47039f765a1d7",
+      "contract_digest": "10f3d37eb756bf026ac9841b7039735dd8e4ee4a198ec165eb4dc46c7ab8673e",
+      "steps": 5,
+      "elapsed_ms": 1477,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 0,
+        "failed": 2,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "form-password-mismatch",
+      "title": "表单校验：form-password-mismatch",
+      "project": "form-validator",
+      "label": {
+        "expected_verdict": "fail",
+        "kind": "local_source_reviewed_defect",
+        "defect_group": "form-validator-required-branch",
+        "basis": "Local source review: checkRequired=true means at least one field is empty, but deeper checks only run in that branch. Not an upstream-maintainer-confirmed issue.",
+        "sources": [
+          "https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b/form-validator/script.js"
+        ]
+      },
+      "actual": "fail",
+      "run_id": "7757d30aac8541e3864de05e33e67116",
+      "contract_digest": "8b47cf611479d63fcf2441d9968348923307ac0a3150b1b7a445c8c8a61117ad",
+      "steps": 5,
+      "elapsed_ms": 1494,
+      "model_calls": 0,
+      "coverage": {
+        "total": 2,
+        "verified": 0,
+        "failed": 2,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shopping-add",
+      "title": "购物清单：shopping-add",
+      "project": "shopping-list",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/mdn/learning-area/blob/21973263ba859ff3477919087b488157f9d618a6/javascript/apis/document-manipulation/shopping-list-finished.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "e637fc4d20bf4d89ad2a8e7c8b2d607a",
+      "contract_digest": "8cab64ba98b60cde854728585dd3ac111ac833926176f9e82227c71e4b161b3d",
+      "steps": 3,
+      "elapsed_ms": 1527,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shopping-two",
+      "title": "购物清单：shopping-two",
+      "project": "shopping-list",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/mdn/learning-area/blob/21973263ba859ff3477919087b488157f9d618a6/javascript/apis/document-manipulation/shopping-list-finished.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "ae329be4bdda4fda93aba405155f9b59",
+      "contract_digest": "2cc43a1ab8ba6da63054102632b7ae451b991e9f25784a459ac10ba6b33d8432",
+      "steps": 5,
+      "elapsed_ms": 1473,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shopping-delete",
+      "title": "购物清单：shopping-delete",
+      "project": "shopping-list",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/mdn/learning-area/blob/21973263ba859ff3477919087b488157f9d618a6/javascript/apis/document-manipulation/shopping-list-finished.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "1514e165e656421cba5add1eeb0156ba",
+      "contract_digest": "dad037955477e8e13147beeaf55ead9dfb5d4b4372793a59f531f4b4930f9d75",
+      "steps": 6,
+      "elapsed_ms": 1493,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    },
+    {
+      "id": "shopping-literal",
+      "title": "购物清单：shopping-literal",
+      "project": "shopping-list",
+      "label": {
+        "expected_verdict": "pass",
+        "kind": "source_derived_normal_behavior",
+        "defect_group": null,
+        "basis": "Engineer-translated upstream source/test behavior; not an independent human annotation panel.",
+        "sources": [
+          "https://github.com/mdn/learning-area/blob/21973263ba859ff3477919087b488157f9d618a6/javascript/apis/document-manipulation/shopping-list-finished.html"
+        ]
+      },
+      "actual": "pass",
+      "run_id": "859eea7da99e479795e3dbc8bb4a375a",
+      "contract_digest": "f0ecc23e66ed83dc17a10f919a75fecce897bd4648e5ba4bca88e24f7867457d",
+      "steps": 3,
+      "elapsed_ms": 1473,
+      "model_calls": 0,
+      "coverage": {
+        "total": 1,
+        "verified": 1,
+        "failed": 0,
+        "blocked": 0,
+        "unclear": 0,
+        "uncovered": 0,
+        "partial": 0,
+        "not_run": 0
+      }
+    }
+  ],
+  "paid_ledger_unchanged": true,
+  "pilot_revisions": [
+    {
+      "case": "expense-balance",
+      "old_run_id": "a424e93b52cd4ea4a133d25568f9b510",
+      "old_contract_digest": "4f046df0cf2c78fa96302ee1b7f51d79d6a45c56a48bb037c146ecb21fe79c59",
+      "old_verdict": "fail",
+      "issue": "Pilot expected a decimal transaction to save, but the original number input default integer step prevented submission.",
+      "new_protocol": "Integer mixed-balance case plus separate native decimal-input rejection check. Old failure/contract retained, not relabelled or pooled into final results."
+    }
+  ],
+  "limitations": [
+    "Selected source-derived fixed plans, not an autonomous planning/requirement-generation score or unseen-project blind test.",
+    "Form defect labels are locally source-reviewed and raw-browser confirmed, not maintainer-confirmed. Five form cases may represent one underlying defect.",
+    "Only one official Juice Shop known challenge is included; no full OWASP/WebArena/BrowserGym suite.",
+    "No per-case legacy backend reset. Static browser contexts/storage are fresh; setup creates unique synthetic backend users.",
+    "Legacy deployment/source association is operator-declared. Static files are SHA-256 pinned and served without business changes.",
+    "Keyboard shortcuts, drag/drop, upload and cross-origin workflows remain outside this registered suite."
+  ],
+  "not_run": [
+    "Paid model planning/comparison",
+    "Independent human annotation panel",
+    "Unseen-project blind evaluation",
+    "Full upstream official test suites"
+  ],
+  "reproduce": ".venv/Scripts/python.exe scripts/benchmark_upstream.py --approve-local-upstream-writes",
+  "audit": ".venv/Scripts/python.exe scripts/benchmark_upstream.py --audit"
+}

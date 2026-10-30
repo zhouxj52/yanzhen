@@ -2,8 +2,11 @@
 
 用途：用未修改业务逻辑的 Spring Petclinic / OWASP Juice Shop，检查验真的
 浏览器操作、输入边界、数据持久化、身份隔离、独立判断及证据导出能力。
-包含 31 条人工根据上游规则转译的契约和操作计划。预期为 30 PASS + 1 FAIL；
-最后一项是 Juice Shop 有意保留的越权读取缺陷，正确检出才算符合预期。
+默认包含 49 条预注册检查，覆盖 4 个仓库的 5 个应用：Petclinic、Juice Shop、
+Expense Tracker、Form Validator 和 MDN Shopping List。预期为 43 PASS + 6 FAIL；
+6 条缺陷用例分属 2 个缺陷组：官方 Juice Shop 越权挑战、本地审阅并用独立
+原始浏览器步骤确认的表单校验分支问题。后者不是上游维护者确认的漏洞。
+固定流程实际执行，不作为模型自主规划成功率。旧 31 条协议用 --suite legacy。
 这些用例不是上游完整官方套件，也不代表自主需求生成或通用漏洞扫描成绩。
 
 准备（在项目根目录运行，所有本机下载/缓存/临时文件放 D 盘）：
@@ -22,10 +25,14 @@
      Windows x64 包，校验 JUICE_ASSET_SHA256，解压到
      .cache/upstream/juice-shop_20.3.0，准备 D 盘 Node24。
      其他平台需从同一官方版本选择匹配平台的发布包/运行环境。
-  4. 两个终端分别前台启动（不需要启动验真网页服务）：
+  4. 准备新增静态目标（只下载固定提交/哈希的文件，不运行安装脚本）：
+     python scripts/benchmark_upstream.py --prepare
+     来源与文件哈希见 benchmarks/upstream-sources.json，源码仅保存在忽略缓存。
+  5. 三个终端分别前台启动（不需要启动验真网页服务）：
      python scripts/benchmark_upstream.py --serve petclinic
      python scripts/benchmark_upstream.py --serve juice-shop
-     默认监听 127.0.0.1:8781、8782，仅使用合成测试数据。
+     python scripts/benchmark_upstream.py --serve static
+     默认监听 127.0.0.1:8781、8782、8783，仅使用合成测试数据。
 
 使用：
   以下 python 指项目虚拟环境的解释器；Windows 可用 .venv/Scripts/python.exe。
@@ -34,11 +41,13 @@
   python scripts/benchmark_upstream.py --approve-local-upstream-writes
   python scripts/benchmark_upstream.py --audit          # 离线核对最近一次原始证据
   python scripts/benchmark_upstream.py --only owner-create --approve-local-upstream-writes
-  可选 --allow-model：额外执行两项 DeepSeek 下一步规划实验。需要本地 .env
+  可选 --suite legacy --allow-model：额外执行两项 DeepSeek 下一步规划实验。需要本地 .env
   配置密钥，复用现有同一个累计 5 元预算账本；默认不调用大模型。
 
-输出：.artifacts/upstream-benchmark-时间.json 与同名 .md，另有每条用例的
-冻结标准、真实操作、截图和 ZIP。退出码 0=本轮全部符合预期，1=有不一致，
+输出：.artifacts/upstream-evaluations/本次编号/ 内的预注册协议、分母、JSON、
+HTML 报告、独立参考截图及含逐条证据的 evaluation.zip。运行前保存全部
+冻结标准、预期标签和动作及协议哈希；失败/受阻保留在分母。退出码
+0=本轮全部符合预期，1=有不一致，
 2=目标/配置尚未就绪。受阻和不确定均不算通过，子集不能冒充完整评测。
 账户创建/登录及部分初态由准备阶段生成，不计入 Agent 自主步骤。
 后端未逐例重置，因此本包不宣称已验证上游写入流程的最小化复现能力。
@@ -59,6 +68,10 @@ import sys
 import uuid
 import zipfile
 import hashlib
+import base64
+import re
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlsplit, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -73,6 +86,10 @@ from yanzhen.store import write_json
 from yanzhen.verifyagent.schema import Action, Bundle, GenericContract, Run, RunInput, Target, digest, now
 from yanzhen.verifyagent.repository import freeze, path, save_bundle, save_target
 from yanzhen.verifyagent.engine import execute
+
+STATIC_LOCK = ROOT / 'benchmarks/upstream-sources.json'
+STATIC_ROOT = ROOT / '.cache/upstream/static-benchmark'
+STATIC_ORIGIN = 'http://127.0.0.1:8783'
 
 PET_SHA = '500158f732419217507c7656904b8e6aa1bcc0d6'
 PET = 'https://github.com/spring-projects/spring-petclinic/blob/' + PET_SHA
@@ -328,6 +345,7 @@ async def run_case(row, target, planner='manual', bundle=None):
         manual_actions=row['actions'] if planner == 'manual' else [], max_model_calls=6, max_seconds=180)
     run = Run(bundle_id=bundle.id, target_id=target.id, contract_digest=bundle.digest, planner=planner)
     write_json(path('runs', run.id) / 'contract.json', bundle.model_dump(mode='json'))
+    write_json(path('runs', run.id) / 'request.json', request.model_dump(mode='json'))
 
     async def approve(current, step):
         current.approvals.append({'action_id': step.id, 'action_digest': digest(step), 'approved': True,
@@ -485,18 +503,461 @@ def write_markdown(report, destination):
     destination.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
 
+def static_lock():
+    data = json.loads(STATIC_LOCK.read_text(encoding='utf-8'))
+    for repo in data['repositories']:
+        if not re.fullmatch(r'[a-z0-9-]{1,60}',repo['id']):
+            raise ValueError('Invalid source cache directory')
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repo['repo']):
+            raise ValueError('Invalid pinned repository')
+        if not re.fullmatch(r'[a-f0-9]{40}', repo['commit']):
+            raise ValueError('Use a full pinned commit')
+        for item in repo['files']:
+            if not item['path'] or '\\' in item['path'] or any(p in {'..', ''} for p in item['path'].split('/')) or item['path'].startswith('/'):
+                raise ValueError('Invalid pinned relative file')
+            if not re.fullmatch(r'[a-f0-9]{64}',item['sha256']) or not re.fullmatch(r'[a-f0-9]{40}',item['git_blob_sha1']) or not 0<item['size']<=524288:
+                raise ValueError('Invalid pinned content hash or size')
+    return data
+
+
+def static_files(verify=True):
+    files = {}
+    for repo in static_lock()['repositories']:
+        for item in repo['files']:
+            relative = repo['id'] + '/' + item['path']
+            source = STATIC_ROOT / relative
+            if verify and (not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != item['sha256']):
+                raise ValueError('Static source missing or hash changed: ' + relative + '; run --prepare')
+            files['/' + relative] = source
+    return files
+
+
+def prepare_static():
+    """Fixed API origin + pinned commits/blobs; no package installation or script execution."""
+    with httpx.Client(timeout=30, trust_env=False, follow_redirects=False) as client:
+        for repo in static_lock()['repositories']:
+            for item in repo['files']:
+                destination = STATIC_ROOT / repo['id'] / item['path']
+                research = ROOT / '.cache/upstream-research' / repo['id'] / item['path']
+                content = None
+                for cached in (destination, research):
+                    if cached.is_file() and hashlib.sha256(cached.read_bytes()).hexdigest() == item['sha256']:
+                        content = cached.read_bytes(); break
+                if content is None:
+                    response = client.get('https://api.github.com/repos/' + repo['repo'] + '/git/blobs/' + item['git_blob_sha1'])
+                    response.raise_for_status()
+                    blob = response.json()
+                    if blob.get('encoding') != 'base64' or blob.get('sha') != item['git_blob_sha1']:
+                        raise ValueError('Unexpected GitHub blob response')
+                    content = base64.b64decode(blob['content'])
+                if len(content) != item['size'] or hashlib.sha256(content).hexdigest() != item['sha256']:
+                    raise ValueError('Pinned upstream content hash mismatch')
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(content)
+    static_files()
+    print(json.dumps({'prepared': True, 'root': str(STATIC_ROOT), 'lock_digest': digest(static_lock()),
+                      'business_source_patched': False, 'executed_upstream_install_scripts': False}))
+
+
+def serve_static():
+    files = static_files()
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *args): pass
+        def do_HEAD(self): self.do_GET(head=True)
+        def do_GET(self, head=False):
+            route = unquote(urlsplit(self.path).path)
+            if route.endswith('/'):
+                route += 'shopping-list-finished.html' if route.endswith('/document-manipulation/') else 'index.html'
+            if route == '/__benchmark_identity__':
+                try:
+                    static_files()
+                    content = json.dumps({'lock_digest': digest(static_lock()), 'files_verified': True}).encode()
+                except ValueError:
+                    self.send_error(409, 'Pinned source integrity check failed'); return
+                kind = 'application/json'
+            elif route in files:
+                source = files[route]
+                content = source.read_bytes()
+                kind = {'.html':'text/html', '.js':'application/javascript', '.css':'text/css'}.get(source.suffix, 'text/plain')
+            else:
+                self.send_error(404); return
+            self.send_response(200)
+            self.send_header('Content-Type', kind + '; charset=utf-8')
+            self.send_header('Content-Length', str(len(content)))
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'none'; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'")
+            self.end_headers()
+            if not head: self.wfile.write(content)
+    server = ThreadingHTTPServer(('127.0.0.1', 8783), Handler)
+    print('Pinned static benchmark: ' + STATIC_ORIGIN, flush=True)
+    try: server.serve_forever()
+    except KeyboardInterrupt: pass
+    finally: server.server_close()
+    return 0
+
+
+def static_cases(marker):
+    vanilla = 'https://github.com/bradtraversy/vanillawebprojects/blob/adc66a181a67049fb413c8862181ddc6c45ba22b'
+    mdn = 'https://github.com/mdn/learning-area/blob/21973263ba859ff3477919087b488157f9d618a6/javascript/apis/document-manipulation/shopping-list-finished.html'
+    rows = []
+    def add_expense(label, amount):
+        return [fill('#text', label), fill('#amount', amount), click('Add transaction')]
+    for identifier, values, expected in [
+        ('expense-income', [('Salary' + marker, '100')], ('$100.00','$100.00','$0.00')),
+        ('expense-outgoing', [('Book' + marker, '-25')], ('$-25.00','$0.00','$25.00')),
+        ('expense-balance', [('Salary' + marker, '100'),('Book' + marker, '-25')], ('$75.00','$100.00','$25.00'))]:
+        steps = [s for label, amount in values for s in add_expense(label, amount)] + [action('reload')]
+        requirement = '新增收支 ' + json.dumps(values, ensure_ascii=False) + '；刷新后余额、收入、支出应分别为 ' + '、'.join(expected) + '。'
+        rows.append(case(identifier, '收支保存与汇总：' + identifier, 'expense-tracker', requirement, steps,
+                         [dom(sel, value, op='eq') for sel, value in zip(('#balance','#money-plus','#money-minus'), expected)],
+                         vanilla + '/expense-tracker/script.js', tags=['persistence','calculation']))
+    rows.append(case('expense-delete', '删除收支并刷新', 'expense-tracker', '新增一笔 20 元收入后删除该条目，刷新后历史应为空且余额为 $0.00。',
+        add_expense('Delete' + marker, '20') + [action('click', locator={'by':'css','value':'#list li button'}), action('reload')],
+        [dom('#list','',op='eq'),dom('#balance','$0.00',op='eq')],vanilla+'/expense-tracker/script.js',tags=['delete','persistence']))
+    invalid,op,value=dom('#amount:invalid',True,visible=True)
+    invalid.update(phase='checkpoint',after_action='click')
+    rows.append(case('expense-fraction-native-validation','小数金额的原生表单约束','expense-tracker',
+        '金额输入的原生步长为整数；先保存 100 元收入，再提交 -25.5 时金额应为无效状态，刷新后余额仍为 $100.00，支出仍为 $0.00。',
+        add_expense('Salary'+marker,'100')+add_expense('Fraction'+marker,'-25.5')+[action('reload')],
+        [(invalid,op,value),dom('#balance','$100.00',op='eq'),dom('#money-minus','$0.00',op='eq')],
+        [vanilla+'/expense-tracker/index.html',vanilla+'/expense-tracker/script.js'],tags=['validation','native-input']))
+    for identifier,label,amount in [('expense-empty-label','','10'),('expense-empty-amount','Empty'+marker,'')]:
+        rows.append(case(identifier, '空收支输入不保存：' + identifier, 'expense-tracker', '收支说明或金额为空时，提交不得新增历史，余额保持 $0.00。',
+            add_expense(label,amount)+[action('reload')], [dom('#list','',op='eq'),dom('#balance','$0.00',op='eq')],
+            vanilla+'/expense-tracker/script.js',tags=['negative-input','validation']))
+    for identifier,values,error_field in [
+        ('form-valid',{},None), ('form-empty',{'username':'','email':'','password':'','password2':''},'all'),
+        ('form-short-username',{'username':'ab'},'username'), ('form-long-username',{'username':'x'*16},'username'),
+        ('form-invalid-email',{'email':'bad-email'},'email'), ('form-short-password',{'password':'123','password2':'123'},'password'),
+        ('form-password-mismatch',{'password2':'Different-942'},'password2')]:
+        fields = {'username':'Tester','email':'test@example.test','password':'Example-942','password2':'Example-942'}
+        fields.update(values)
+        if error_field == 'all':
+            checks = [dom('.error #'+field,True,visible=True) for field in fields]
+            requirement = '所有字段留空并提交，四个必填字段都应显示错误。'
+        elif error_field:
+            checks = [dom('.error #'+error_field,True,visible=True)]
+            # Inputs below are public synthetic data, never actual user credentials.
+            requirement = '其他字段合法，提交 ' + error_field + '=' + repr(fields[error_field]) + '；该字段应显示格式、长度或确认不一致的错误。'
+        else:
+            checks = [dom('.success #'+field,True,visible=True) for field in fields]
+            requirement = '填写合法用户名 Tester、邮箱 test@example.test 和一致的合成测试密码后提交，四个字段都应显示验证成功。'
+        known = error_field not in {None,'all'}
+        row = case(identifier,'表单校验：'+identifier,'form-validator',requirement,
+                   [fill('#'+k,v) for k,v in fields.items()]+[click('Submit')],checks,
+                   vanilla+'/form-validator/script.js',expected='fail' if known else 'pass',tags=['validation','negative-input' if known else 'control'])
+        if known:
+            row['defect_group'] = 'form-validator-required-branch'
+            row['label_note'] = 'Local source review: checkRequired=true means at least one field is empty, but deeper checks only run in that branch. Not an upstream-maintainer-confirmed issue.'
+            row['reference'] = {'selector':'.error #'+error_field,'expected_visible':True}
+        rows.append(row)
+    def add_item(value): return [fill('#item',value),click('Add item')]
+    first,second='Milk'+marker,'Bread'+marker
+    for identifier,requirement,steps,checks in [
+        ('shopping-add','新增购物项后应在清单显示输入的原文。',add_item(first),[dom('ul li span',first,op='eq')]),
+        ('shopping-two','连续新增两项，两项都应保留在清单中。',add_item(first)+add_item(second),[dom('ul',first),dom('ul',second)]),
+        ('shopping-delete','新增两项后删除第一项，只能移除第一项，第二项仍应保留。',add_item(first)+add_item(second)+[action('click',locator={'by':'css','value':'ul li:first-child button'})],
+         [dom('ul',first,op='not_contains'),dom('ul',second)]),
+        ('shopping-literal','输入 <strong>文字</strong> 应按普通文字显示，清单中不得生成 strong 元素。',add_item('<strong>文字</strong>'),
+         [dom('ul li span','<strong>文字</strong>',op='eq'),dom('ul strong',False,visible=True)])]:
+        rows.append(case(identifier,'购物清单：'+identifier,'shopping-list',requirement,steps,checks,mdn,tags=['crud','text-safety']))
+    return rows
+
+
+def legacy_source_identity(projects):
+    """File identity only; a running deployment is still explicitly operator-declared."""
+    output = {}
+    if 'petclinic' in projects:
+        work=ROOT/'.cache/upstream/spring-petclinic'
+        revision=subprocess.run(['git','-C',str(work),'rev-parse','HEAD'],capture_output=True,text=True,check=True).stdout.strip()
+        dirty=subprocess.run(['git','-C',str(work),'diff','--name-only','HEAD'],capture_output=True,text=True,check=True).stdout.strip()
+        if revision!=PET_SHA or dirty:raise ValueError('Petclinic source differs from registered commit')
+        jar=work/'target/spring-petclinic-4.0.0-SNAPSHOT.jar'
+        output['petclinic']={'commit':revision,'tracked_source_clean':True,'local_jar_sha256':hashlib.sha256(jar.read_bytes()).hexdigest(),'deployment_link':'operator_declared'}
+    if 'juice-shop' in projects:
+        work=ROOT/'.cache/upstream/juice-shop_20.3.0'
+        package=json.loads((work/'package.json').read_text(encoding='utf-8'))
+        if package['version']!='20.3.0':raise ValueError('Juice Shop version differs from pinned release')
+        output['juice-shop']={'release':'v20.3.0','local_entry_sha256':hashlib.sha256((work/'build/app.js').read_bytes()).hexdigest(),
+                             'original_asset_sha256':JUICE_ASSET_SHA256,'deployment_link':'operator_declared; local entry hash is not an attestation of complete build provenance'}
+    return output
+
+
+def expanded_inventory(marker='INVENTORY'):
+    rows = inventory() if marker == 'INVENTORY' else pet_cases(marker) + juice_cases('',marker,inventory_only=True)[0]
+    return rows + static_cases(marker)
+
+
+def label_row(row):
+    known = row['expected'] == 'fail'
+    return {'expected_verdict':row['expected'], 'kind':'upstream_documented_defect' if row['id']=='shop-read-other-known-bug' else 'local_source_reviewed_defect' if known else 'source_derived_normal_behavior',
+            'defect_group':row.get('defect_group', 'juice-cross-account-basket-read' if known else None),
+            'basis':row.get('label_note','Engineer-translated upstream source/test behavior; not an independent human annotation panel.'),
+            'sources':row['sources']}
+
+
+def summarize_expanded(rows):
+    normal = [r for r in rows if r['label']['expected_verdict']=='pass']
+    defects = [r for r in rows if r['label']['expected_verdict']=='fail']
+    detected = sum(r['actual']=='fail' for r in defects)
+    false_positives = sum(r['actual']=='fail' for r in normal)
+    groups = {r['label']['defect_group'] for r in defects}
+    return {'registered_cases':len(rows), 'executed_cases':sum(r.get('executed',False) for r in rows),
+            'completed_cases':sum(r.get('run_status')=='completed' for r in rows),
+            'verdicts':dict(Counter(r['actual'] for r in rows)), 'normal_cases':len(normal),
+            'normal_passed':sum(r['actual']=='pass' for r in normal), 'false_positive_cases':false_positives,
+            'labelled_defect_cases':len(defects), 'detected_defect_cases':detected,
+            'labelled_defect_groups':len(groups), 'detected_defect_groups':sum(any(r['actual']=='fail' and r['label']['defect_group']==group for r in defects) for group in groups),
+            'blocked_or_unclear':sum(r['actual'] in {'blocked','unclear'} for r in rows),
+            'matched_expectations':sum(r['actual']==r['label']['expected_verdict'] for r in rows),
+            'detection_fraction':{'numerator':detected,'denominator':len(defects)},
+            'false_positive_fraction':{'numerator':false_positives,'denominator':len(normal)},
+            'model_requests':sum(r.get('model_calls',0) for r in rows),
+            'prompt_tokens':sum(r.get('prompt_tokens',0) for r in rows),
+            'completion_tokens':sum(r.get('completion_tokens',0) for r in rows),
+            'execution_ms':sum(r.get('elapsed_ms',0) for r in rows),
+            'autonomous_success_rate':None,
+            'scope':'Selected source-labelled fixed-plan integration cases; repeated cases from one defect group are not separate bugs.'}
+
+
+async def reference_labels(rows, destination):
+    """Separate raw Chromium observer; does not use ToolExecutor or its oracle."""
+    from playwright.async_api import async_playwright
+    output = []
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        try:
+            for row in rows:
+                if not row.get('reference'): continue
+                context = await browser.new_context(service_workers='block')
+                await context.route('**/*',lambda route: route.continue_() if route.request.url.startswith(STATIC_ORIGIN+'/') else route.abort())
+                page = await context.new_page()
+                try:
+                    await page.goto(STATIC_ORIGIN+'/vanilla/form-validator/index.html')
+                    for step in row['actions']:
+                        if step['kind']=='fill': await page.locator(step['locator']['value']).fill(step['value'])
+                        elif step['kind']=='click': await page.get_by_role('button',name=step['locator']['value'],exact=True).click()
+                        else: raise ValueError('Unreviewed reference action')
+                    visible = await page.locator(row['reference']['selector']).is_visible()
+                    actual = 'pass' if visible == row['reference']['expected_visible'] else 'fail'
+                    screenshot = destination / ('reference-'+row['id']+'.png')
+                    await page.screenshot(path=str(screenshot),mask=[page.locator('input[type=password]')])
+                    output.append({'case_id':row['id'],'selector':row['reference']['selector'],'observed_visible':visible,
+                                   'expected_visible':row['reference']['expected_visible'],'reference_verdict':actual,
+                                   'matches_preregistered_label':actual==row['expected'], 'screenshot':screenshot.name,
+                                   'screenshot_sha256':hashlib.sha256(screenshot.read_bytes()).hexdigest()})
+                except Exception as exc:
+                    output.append({'case_id':row['id'],'reference_verdict':'blocked','matches_preregistered_label':False,
+                                   'error_type':type(exc).__name__})
+                finally: await context.close()
+        finally: await browser.close()
+    return output
+
+
+def expanded_readiness(projects):
+    _, rows = check_targets(projects)
+    if projects & {'expense-tracker','form-validator','shopping-list'}:
+        try:
+            static_files()
+            with httpx.Client(timeout=10,trust_env=False) as client:
+                response=client.get(STATIC_ORIGIN+'/__benchmark_identity__');response.raise_for_status()
+                ok=response.json()=={'lock_digest':digest(static_lock()),'files_verified':True}
+            rows.append({'target':'static','ready':ok,'url':STATIC_ORIGIN,'lock_digest':digest(static_lock())})
+        except (ValueError,httpx.HTTPError,FileNotFoundError) as exc:
+            rows.append({'target':'static','ready':False,'error':type(exc).__name__,'next':'Run --prepare and --serve static'})
+    return rows
+
+
+def expanded_artifacts(report, directory):
+    import html
+    report['summary'] = summarize_expanded(report['cases'])
+    write_json(directory/'report.json',report)
+    rows=[]
+    for row in report['cases']:
+        href = row.get('view_url','')
+        rows.append('<tr>'+''.join('<td>'+html.escape(str(v))+'</td>' for v in (row['project'],row['title'],row['label']['expected_verdict'],row['actual'],row.get('elapsed_ms',0)))+
+                    '<td>'+('<a href="http://127.0.0.1:8767'+html.escape(href,quote=True)+'">查看实际运行</a>' if href else html.escape(row.get('reason','未执行')) )+'</td></tr>')
+    summary=report['summary']
+    html_page='<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>验真真实项目评测记录</title><style>body{font:16px/1.8 "Microsoft YaHei",sans-serif;color:#172333;max-width:1200px;margin:40px auto;padding:20px;background:#f5f8fc}table{width:100%;border-collapse:collapse;background:white}td,th{padding:12px;border:1px solid #bccbd9;text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere}a{color:#174e89}.table{overflow:auto}</style><h1>真实项目评测记录</h1><p>固定流程实际执行；模型调用与自主规划单独计量。以下成绩仅适用于这些已标注用例。</p><p>'+html.escape(str(summary))+'</p><div class="table"><table><thead><tr><th>应用</th><th>检查</th><th>预期验收结论</th><th>实际结论</th><th>耗时 ms</th><th>证据</th></tr></thead><tbody>'+''.join(rows)+'</tbody></table></div><h2>本轮边界</h2><pre>'+html.escape(json.dumps(report['limitations'],ensure_ascii=False,indent=2))+'</pre></html>'
+    (directory/'report.html').write_text(html_page,encoding='utf-8')
+    payloads={p.name:p.read_bytes() for p in directory.iterdir() if p.is_file() and (p.suffix in {'.json','.html','.png'}) and p.name!='manifest.json'}
+    for row in report['cases']:
+        if row.get('run_id'): payloads['runs/'+row['id']+'/evidence.zip']=(path('runs',row['run_id'])/'evidence.zip').read_bytes()
+    manifest={'format_version':1,'protocol_digest':report['protocol_digest'],'files':{name:{'size':len(data),'sha256':hashlib.sha256(data).hexdigest()} for name,data in sorted(payloads.items())}}
+    payloads['manifest.json']=json.dumps(manifest,ensure_ascii=False,indent=2).encode()
+    temporary=directory/'evaluation.zip.tmp'
+    with zipfile.ZipFile(temporary,'w',zipfile.ZIP_DEFLATED) as z:
+        for name,data in payloads.items():z.writestr(name,data)
+    temporary.replace(directory/'evaluation.zip')
+
+
+def audit_expanded(filename):
+    from yanzhen.verifyagent.repository import load_run,load_bundle
+    report=json.loads(filename.read_text(encoding='utf-8'))
+    directory=filename.parent
+    protocol=json.loads((directory/'protocol.json').read_text(encoding='utf-8'))
+    if digest(protocol)!=report['protocol_digest']:raise ValueError('Preregistered protocol changed')
+    expected={r['id']:r for r in protocol['cases']}
+    if len(expected)!=len(protocol['cases']) or set(expected)!={r['id'] for r in report['cases']} or len(report['cases'])!=len(expected):
+        raise ValueError('Registered denominator differs from report')
+    for row in report['cases']:
+        frozen=expected[row['id']]
+        if row['label']!=frozen['label']:raise ValueError('Ground-truth label changed after registration')
+        if row.get('run_id'):
+            run=load_run(row['run_id']);bundle=load_bundle(run.bundle_id);bundle.assert_frozen()
+            if bundle.digest!=frozen['contract_digest'] or run.contract_digest!=bundle.digest or run.bundle_id!=frozen['bundle_id']:
+                raise ValueError('Frozen acceptance standard changed')
+            actual=run.results[0]['verdict'] if run.results else 'blocked'
+            if actual!=row['actual'] or run.status!=row['run_status']:raise ValueError('Reported verdict differs from actual run')
+            if row['steps']!=len(run.trace) or row['elapsed_ms']!=run.usage['wall_time_ms'] or row['model_calls']!=len(run.usage.get('calls',[])):
+                raise ValueError('Reported resource/step metrics differ from run')
+            with zipfile.ZipFile(path('runs',run.id)/'evidence.zip') as z:
+                manifest=json.loads(z.read('manifest.json'))
+                for name,item in manifest['files'].items():
+                    data=z.read(name)
+                    if len(data)!=item['size'] or hashlib.sha256(data).hexdigest()!=item['sha256']:raise ValueError('Run archive hash mismatch')
+            for e in run.evidence:
+                if e.content_hash!=digest(e.model_dump(exclude={'content_hash'})):raise ValueError('Sealed observation changed')
+        elif row['actual']!='blocked':raise ValueError('Unexecuted case received a conclusive verdict')
+    if summarize_expanded(report['cases'])!=report['summary']:raise ValueError('Metrics do not match complete registered cases')
+    with zipfile.ZipFile(directory/'evaluation.zip') as z:
+        manifest=json.loads(z.read('manifest.json'))
+        if z.read('report.json')!=filename.read_bytes() or z.read('protocol.json')!=(directory/'protocol.json').read_bytes():
+            raise ValueError('Local report/protocol differ from exported archive')
+        if set(manifest['files'])!=set(z.namelist())-{'manifest.json'}:raise ValueError('Incomplete evaluation manifest')
+        for name,item in manifest['files'].items():
+            data=z.read(name)
+            if len(data)!=item['size'] or hashlib.sha256(data).hexdigest()!=item['sha256']:raise ValueError('Evaluation archive hash mismatch')
+    print(json.dumps({'audit':'passed','registered_cases':len(expected),'protocol_digest':report['protocol_digest'],'report':str(filename)},ensure_ascii=False))
+
+
+async def expanded_main(args, parser):
+    available=expanded_inventory()
+    if args.list:
+        print(json.dumps({'mode':'inventory_NOT_EXECUTED','applications':5,'repositories':4,
+            'cases':[{**{k:r[k] for k in ('id','title','project','sources')},'label':label_row(r)} for r in available],
+            'static_sources':static_lock(),'legacy_sources':SOURCES,'autonomous_success_rate':None},ensure_ascii=False,indent=2));return 0
+    if args.audit:
+        candidates=sorted((ROOT/'.artifacts/upstream-evaluations').glob('*/report.json'),key=lambda p:p.stat().st_mtime)
+        if args.audit=='latest' and not candidates:parser.error('No expanded evaluation yet')
+        audit_expanded(candidates[-1] if args.audit=='latest' else Path(args.audit).resolve());return 0
+    selected={v.strip() for v in args.only.split(',') if v.strip()} if args.only is not None else {r['id'] for r in available}
+    if not selected or selected-{r['id'] for r in available}:parser.error('Unknown or empty --only; see --list')
+    projects={r['project'] for r in available if r['id'] in selected}
+    readiness=expanded_readiness(projects)
+    if args.check:
+        print(json.dumps({'targets':readiness},ensure_ascii=False,indent=2));return 0 if all(r['ready'] for r in readiness) else 2
+    if args.allow_model:parser.error('Expanded suite currently measures fixed plans only; use --suite legacy --allow-model for the separately labelled older two-task experiment. Budget settings are never overridden.')
+    if not args.approve_local_upstream_writes:parser.error('Pass --approve-local-upstream-writes for these synthetic local targets only')
+    os.environ['YZ_VERIFY_ALLOWED_ORIGINS']='http://127.0.0.1:8781,http://127.0.0.1:8782,'+STATIC_ORIGIN
+    # Explicit manual mode below cannot dispatch model requests, regardless of .env.
+    marker='YZ'+uuid.uuid4().hex[:10]
+    states={r['target']:r['ready'] for r in readiness}
+    setup_error=None
+    try:
+        shop,identities=juice_cases('http://127.0.0.1:8782',marker) if 'juice-shop' in projects and states.get('juice-shop') else (juice_cases('',marker,inventory_only=True)[0],{})
+    except Exception as exc:
+        setup_error=type(exc).__name__;shop,identities=juice_cases('',marker,inventory_only=True);states['juice-shop']=False
+    all_cases=pet_cases(marker)+shop+static_cases(marker)
+    cases=[r for r in all_cases if r['id'] in selected]
+    directory=ROOT/'.artifacts/upstream-evaluations'/uuid.uuid4().hex
+    directory.mkdir(parents=True)
+    write_json(directory/'source-lock.json',static_lock())
+    targets={};bundles={}
+    origins={'petclinic':'http://127.0.0.1:8781/','juice-shop':'http://127.0.0.1:8782/',
+             'expense-tracker':STATIC_ORIGIN+'/vanilla/expense-tracker/', 'form-validator':STATIC_ORIGIN+'/vanilla/form-validator/',
+             'shopping-list':STATIC_ORIGIN+'/mdn-learning/javascript/apis/document-manipulation/'}
+    protocol={'format_version':1,'registered_at':now(),'suite':'upstream-fixed-plans-v3','subset':len(cases)!=len(available),'cases':[],
+              'label_provenance':'Engineer source/test review plus separate raw-browser reference on local form defect; no independent human panel or unseen-project blind evaluation.',
+              'sources':{'static_lock_digest':digest(static_lock()),'legacy':SOURCES},
+              'local_legacy_files':legacy_source_identity(projects & {r['target'] for r in readiness if r['ready']})}
+    protocol['pilot_revisions']=[{'case':'expense-balance','old_run_id':'a424e93b52cd4ea4a133d25568f9b510',
+        'old_contract_digest':'4f046df0cf2c78fa96302ee1b7f51d79d6a45c56a48bb037c146ecb21fe79c59',
+        'old_verdict':'fail','issue':'Pilot expected a decimal transaction to save, but the original number input default integer step prevented submission.',
+        'new_protocol':'Integer mixed-balance case plus separate native decimal-input rejection check. Old failure/contract retained, not relabelled or pooled into final results.'}]
+    for row in cases:
+        project=row['project']
+        if project not in targets:
+            targets[project]=Target(name='External benchmark · '+project,base_url=origins[project],interface='api' if project=='juice-shop' else 'web',
+                identities=identities if project=='juice-shop' else {},environment='local',authorized=True,
+                isolation_note='New browser/API sessions per case. Static storage isolated. Legacy backend uses unique synthetic users/entities, no per-case DB reset. Deployment/source relation for legacy targets is operator-declared.')
+            save_target(targets[project])
+        if project=='shopping-list':row['actions'].insert(0,nav('shopping-list-finished.html'))
+        bundle=Bundle(requirements=row['requirement'],target_id=targets[project].id,provider='manual',contracts=[row['contract']])
+        save_bundle(bundle);bundle=freeze(bundle.id,bundle.calculate_digest(),'source-reviewed-local-benchmark-v3')
+        bundles[row['id']]=bundle
+        protocol['cases'].append({'id':row['id'],'project':project,'label':label_row(row),'bundle_id':bundle.id,'contract_digest':bundle.digest,
+            'requirements':row['requirement'],'contract':row['contract'].model_dump(mode='json'),'actions':row['actions']})
+    write_json(directory/'protocol.json',protocol)
+    # Every standard, action and expected label is on disk before any evaluated action.
+    commitment={'protocol_digest':digest(protocol),'registered_at':protocol['registered_at'],'case_count':len(cases)}
+    write_json(directory/'commitment.json',commitment)
+    print(json.dumps({'registered':commitment,'directory':str(directory)},ensure_ascii=False),flush=True)
+    try:
+        references=await reference_labels([r for r in cases if states.get('static')],directory)
+    except Exception as exc:
+        references=[{'case_id':r['id'],'reference_verdict':'blocked','matches_preregistered_label':False,
+                     'error_type':type(exc).__name__} for r in cases if r.get('reference')]
+    write_json(directory/'reference-observations.json',references)
+    conflicts={r['case_id'] for r in references if not r['matches_preregistered_label']}
+    from yanzhen import store
+    ledger=store.ARTIFACTS/'verifyagent/model-budget.json'
+    ledger_before=hashlib.sha256(ledger.read_bytes()).hexdigest() if ledger.is_file() else None
+    report={'protocol':'upstream-fixed-plans-v3','created_at':now(),'protocol_digest':digest(protocol),'subset':protocol['subset'],
+            'readiness':readiness,'setup_error':setup_error,'cases':[], 'references':references,'summary':{},
+            'planner':'explicit_manual','applications_registered':len(projects),'upstream_repository_count':len({'petclinic' if p=='petclinic' else 'juice-shop' if p=='juice-shop' else 'vanilla' if p in {'expense-tracker','form-validator'} else 'mdn' for p in projects}),
+            'limitations':['Selected source-derived fixed plans, not an autonomous planning/requirement-generation score or unseen-project blind test.',
+                'Form defect labels are locally source-reviewed and raw-browser confirmed, not maintainer-confirmed. Five form cases may represent one underlying defect.',
+                'Only one official Juice Shop known challenge is included; no full OWASP/WebArena/BrowserGym suite.',
+                'No per-case legacy backend reset. Static browser contexts/storage are fresh; setup creates unique synthetic backend users.',
+                'Legacy deployment/source association is operator-declared. Static files are SHA-256 pinned and served without business changes.',
+                'Keyboard shortcuts, drag/drop, upload and cross-origin workflows remain outside this registered suite.'],
+            'not_run':['Paid model planning/comparison','Independent human annotation panel','Unseen-project blind evaluation','Full upstream official test suites']}
+    for row in cases:
+        ready=states.get(row['project'] if row['project'] in {'petclinic','juice-shop'} else 'static',False)
+        if not ready or row['id'] in conflicts:
+            result={k:row[k] for k in ('id','title','project')}
+            result.update(actual='blocked',executed=False,run_status='not_started',model_calls=0,
+                          reason='Reference label conflict; retained without changing label' if row['id'] in conflicts else 'Target/setup unavailable; remains in registered denominator')
+        else:
+            result,_=await run_case(row,targets[row['project']],bundle=bundles[row['id']])
+            from yanzhen.verifyagent.repository import load_run
+            from yanzhen.verifyagent.coverage import build_coverage
+            run=load_run(result['run_id'])
+            result.update(executed=True,run_status=run.status,coverage=build_coverage(bundles[row['id']],run,targets[row['project']])['summary'])
+        result['label']=label_row(row)
+        report['cases'].append(result)
+        write_json(directory/'progress.json',report)
+    ledger_after=hashlib.sha256(ledger.read_bytes()).hexdigest() if ledger.is_file() else None
+    report['paid_ledger_unchanged']=ledger_before==ledger_after
+    expanded_artifacts(report,directory)
+    audit_expanded(directory/'report.json')
+    print(json.dumps({'summary':report['summary'],'report':str(directory/'report.json'),'html':str(directory/'report.html'),'zip':str(directory/'evaluation.zip')},ensure_ascii=False,indent=2),flush=True)
+    return 0 if all(r['actual']==r['label']['expected_verdict'] for r in report['cases']) else 1
+
+
 async def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     read_modes = parser.add_mutually_exclusive_group()
     read_modes.add_argument('--list', action='store_true', help='Offline inventory; no target setup or execution')
     read_modes.add_argument('--check', action='store_true', help='Read-only readiness check')
-    read_modes.add_argument('--serve', choices=['petclinic', 'juice-shop'], help='Run a prepared target in foreground')
+    read_modes.add_argument('--serve', choices=['petclinic', 'juice-shop', 'static'], help='Run a prepared target in foreground')
+    read_modes.add_argument('--prepare', action='store_true', help='Fetch only hash-pinned static benchmark files into the ignored cache')
     read_modes.add_argument('--audit', nargs='?', const='latest', help='Offline audit of a report, default latest local run')
     parser.add_argument('--approve-local-upstream-writes', action='store_true')
     parser.add_argument('--allow-model', action='store_true', help='Two bounded real planning tasks; shared existing 5 CNY ledger')
+    parser.add_argument('--suite', choices=['expanded', 'legacy'], default='expanded', help='Default: five applications from four upstream repositories')
     parser.add_argument('--only', help='Comma-separated case ids for investigation; never merged into an earlier score')
     args = parser.parse_args()
     initialize()
+    if args.prepare:
+        prepare_static()
+        return 0
+    if args.serve == 'static':
+        return serve_static()
+    if args.suite == 'expanded' and not args.serve:
+        return await expanded_main(args, parser)
     available = inventory()
     if args.list:
         print(json.dumps({'mode': 'inventory_only_NOT_EXECUTED', 'cases': [{k: r[k] for k in ('id', 'title', 'project', 'expected', 'sources')} for r in available],
@@ -527,8 +988,6 @@ async def main():
     os.environ['YZ_VERIFY_ALLOWED_ORIGINS'] = 'http://127.0.0.1:8781,http://127.0.0.1:8782'
     if args.allow_model:
         os.environ['YZ_ENABLE_MODEL'] = '1'
-        os.environ['YZ_VERIFY_BUDGET_CNY'] = '5'
-        os.environ['YZ_VERIFY_MAX_PAID_CALLS'] = '60'
     marker = 'YZ' + uuid.uuid4().hex[:10]
     shop, identities = juice_cases('http://127.0.0.1:8782', marker) if 'juice-shop' in projects else ([], {})
     cases = (pet_cases(marker) if 'petclinic' in projects else []) + shop

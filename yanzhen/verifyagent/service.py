@@ -14,12 +14,15 @@ class VerifyService:
     def __init__(self):
         from .projects import ProjectPreviews
         self.previews = ProjectPreviews()
+        from .challenges import ChallengeService
+        self.challenges = ChallengeService(self)
         self.tasks = {}
         self.waiters = {}
         self.active = {}
         self.semaphore = asyncio.Semaphore(2)
 
     def recover(self):
+        self.challenges.recover()
         for item in list_runs(limit=None):
             if item["status"] in {"queued", "running", "waiting_approval"}:
                 run = load_run(item["id"])
@@ -107,10 +110,14 @@ class VerifyService:
 
     def cancel(self, identifier):
         if identifier not in self.tasks:
+            child = self.active.get(identifier)
+            if child and child.challenge_id:
+                return self.challenges.cancel(child.challenge_id)
             raise ValueError("Job is not active")
         self.tasks[identifier].cancel()
 
     async def close(self):
+        await self.challenges.close()
         jobs = list(self.tasks.values())
         for task in jobs:
             task.cancel()

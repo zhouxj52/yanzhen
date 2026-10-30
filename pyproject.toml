@@ -12,6 +12,7 @@ dependencies = [
   "uvicorn==0.54.0",
   "httpx==0.28.1",
   "httpcore==1.0.9",
+  "esprima==4.0.1",
   "pydantic==2.14.1",
   "playwright==1.64.0",
   "mcp>=1.0,<2",
